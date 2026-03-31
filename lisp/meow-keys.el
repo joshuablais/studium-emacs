@@ -3,11 +3,6 @@
 ;; Leader map — bound to SPC in meow-setup.el via meow-normal/motion-define-key
 (defvar my-leader-map (make-sparse-keymap) "Primary leader keymap.")
 
-;; Window bindings
-(define-key my-leader-map (kbd "w v") #'split-window-right)
-(define-key my-leader-map (kbd "w s") #'split-window-below)
-(define-key my-leader-map (kbd "w d") #'delete-window)
-
 ;; Buffer
 (define-key my-leader-map (kbd "b k") (lambda () (interactive) (kill-buffer (current-buffer))))
 (define-key my-leader-map (kbd "b l") #'my/switch-to-last-buffer)

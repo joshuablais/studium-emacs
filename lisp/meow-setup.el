@@ -1,12 +1,33 @@
 ;;; meow-setup.el --- Description -*- lexical-binding: t; -*-
 
-(defvar my-leader-map (make-sparse-keymap) "Primary leader keymap.")
-
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak-dh)
+
+  (meow-leader-define-key
+   '("?" . meow-cheatsheet)
+   '("." . find-file)
+   '("," . consult-buffer)
+   '("f r" . consult-recent-file)
+   ;; Window bindings
+   '("w v" . split-window-right)
+   '("w s" . split-window-below)
+   '("w d" . delete-window)
+   ;; Buffer
+   '("1" . meow-digit-argument)
+   '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument)
+   '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument)
+   '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument)
+   '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument)
+   '("0" . meow-digit-argument))
+
   (meow-motion-define-key
    '("e" . meow-prev)
    '("<escape>" . ignore))
+
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("1" . meow-expand-1)
@@ -30,15 +51,15 @@
    '("b" . meow-back-word)
    '("B" . meow-back-symbol)
    '("c" . meow-change)
-   '("e" . meow-prev)
    '("d" . meow-clipboard-kill)
+   '("e" . meow-prev)
    '("E" . meow-prev-expand)
    '("f" . flash-jump)
    '("g" . meow-cancel-selection)
    '("G" . meow-grab)
    '("h" . meow-left)
    '("H" . meow-left-expand)
-   '("i" . meow-right)
+   '("i" . meow-insert)
    '("I" . meow-right-expand)
    '("j" . meow-join)
    '("l" . meow-line)
@@ -52,7 +73,6 @@
    '("p" . meow-clipboard-yank)
    '("q" . meow-quit)
    '("r" . meow-replace)
-   '("s" . meow-insert)
    '("S" . meow-open-above)
    '("t" . meow-till)
    '("u" . meow-undo)
@@ -65,24 +85,23 @@
    '("y" . meow-clipboard-save)
    '("z" . meow-pop-selection)
    '("'" . repeat)
+   '("<tab>" . indent-for-tab-command)
    '("<escape>" . ignore))
-  (dolist (entry '((dired-mode . motion)
-                   (elfeed-search-mode . motion)
-                   (elfeed-show-mode . motion)
-                   (erc-mode . motion)
-                   (pdf-view-mode . motion)
-                   (calibredb-search-mode . motion)
-                   (dirvish-mode . motion)))
-    (add-to-list 'meow-mode-state-list entry)))
+
+  (setq meow-mode-state-list
+        '((dired-mode . motion)
+          (elfeed-search-mode . motion)
+          (elfeed-show-mode . motion)
+          (erc-mode . motion)
+          (pdf-view-mode . motion)
+          (calibredb-search-mode . motion)
+          (dirvish-mode . motion))))
 
 (use-package meow
   :demand t
   :config
   (meow-setup)
-  (meow-global-mode 1)
-  ;; These only work AFTER meow-global-mode
-  (define-key meow-normal-state-keymap (kbd "SPC") my-leader-map)
-  (define-key meow-motion-state-keymap (kbd "SPC") my-leader-map))
+  (meow-global-mode 1))
 
 (provide 'meow-setup)
 ;;; meow-setup.el ends here
