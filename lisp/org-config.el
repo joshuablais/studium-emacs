@@ -103,18 +103,24 @@
     (interactive "p")
     (dotimes (_ count) (+org--insert-item 'above)))
 
-
   (with-eval-after-load 'org
+    (defun +org/smart-return ()
+      "Dwim in normal state, org-return in insert."
+      (interactive)
+      (if (meow-insert-mode-p)
+          (org-return)
+        (+org/dwim-at-point)))
+
     (define-key org-mode-map (kbd "M-RET")        #'+org/insert-item-below)
     (define-key org-mode-map (kbd "C-<return>")   #'+org/insert-item-below)
     (define-key org-mode-map (kbd "C-S-<return>") #'+org/insert-item-above)
-    (define-key org-mode-map (kbd "RET")          #'+org/dwim-at-point)))
+    (define-key org-mode-map (kbd "RET")          #'+org/smart-return)))
 
-  (defun my/org-clock-in-if-starting ()
-    "Clock in when task state changes to STRT."
-    (when (and (string= org-state "STRT")
-               (not (org-clock-is-active)))
-      (org-clock-in)))
+(defun my/org-clock-in-if-starting ()
+  "Clock in when task state changes to STRT."
+  (when (and (string= org-state "STRT")
+             (not (org-clock-is-active)))
+    (org-clock-in)))
 
 (defun my/org-clock-out-if-not-starting ()
   "Clock out when leaving STRT state."

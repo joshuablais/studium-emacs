@@ -231,6 +231,7 @@
   (setq meow-mode-state-list
         '((dired-mode . motion)
           (elfeed-search-mode . motion)
+          (org-mode . normal)
           (elfeed-show-mode . motion)
           (erc-mode . insert)
           (pdf-view-mode . motion)
@@ -257,7 +258,9 @@
   (cond
    ((minibufferp)
     (minibuffer-complete))
-   ((derived-mode-p 'org-mode) (org-cycle))
+   ((and (derived-mode-p 'org-mode)
+         (meow-normal-mode-p))
+    (org-cycle))
    ((and (derived-mode-p 'magit-mode)
          (fboundp 'magit-section-toggle))
     (call-interactively #'magit-section-toggle))
