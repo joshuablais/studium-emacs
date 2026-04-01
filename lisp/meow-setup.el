@@ -121,12 +121,35 @@
                  (call-interactively #'find-file)))))
 
   (meow-motion-define-key
+   ;; Navigation
    '("e" . meow-prev)
    '("n" . meow-next)
    '("h" . meow-left)
+   '("i" . meow-right-expand)
+   '("w" . meow-next-word)
+   '("W" . meow-next-symbol)
+   '("b" . meow-back-word)
+   '("B" . meow-back-symbol)
+   '("L" . meow-goto-line)
+   '("^" . back-to-indentation)
+   ;; Selection
+   '("l" . meow-line)
+   '("m" . meow-mark-word)
+   '("M" . meow-mark-symbol)
+   '("v" . meow-search)
+   '("V" . meow-visit)
+   '("%" . meow-block)
+   '(";" . meow-reverse)
+   '("," . meow-inner-of-thing)
+   '("." . meow-bounds-of-thing)
+   '("[" . meow-beginning-of-thing)
+   '("]" . meow-end-of-thing)
+   ;; Yank
+   '("y" . meow-clipboard-save)
+   '("g" . meow-cancel-selection)
+   ;; Jump
    '("f" . flash-jump)
    '("/" . consult-line)
-   '("g" . meow-cancel-selection)
    '("<escape>" . ignore))
 
   (meow-normal-define-key
@@ -210,6 +233,7 @@
           (pdf-view-mode . motion)
           (calibredb-search-mode . motion)
           (dirvish-mode . motion)
+          (messages-buffer-mode . motion)
           (help-mode . motion)
           (info-mode . motion)
           (occur-mode . motion)
