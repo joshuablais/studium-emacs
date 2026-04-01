@@ -3,14 +3,7 @@
 ;; code folding
 (use-package kirigami
   :ensure t
-  :config
-  (meow-normal-define-key
-   '("z o" . kirigami-open-fold)
-   '("z O" . kirigami-open-fold-rec)
-   '("z c" . kirigami-close-fold)
-   '("z a" . kirigami-toggle-fold)
-   '("z r" . kirigami-open-folds)
-   '("z m" . kirigami-close-folds)))
+  :config)
 
 ;; global formatting
 (use-package apheleia
