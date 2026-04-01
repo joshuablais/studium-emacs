@@ -232,7 +232,7 @@
         '((dired-mode . motion)
           (elfeed-search-mode . motion)
           (elfeed-show-mode . motion)
-          (erc-mode . motion)
+          (erc-mode . insert)
           (pdf-view-mode . motion)
           (calibredb-search-mode . motion)
           (dirvish-mode . motion)
