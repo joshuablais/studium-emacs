@@ -194,7 +194,8 @@
    '("N" . meow-next-expand)
    '("o" . meow-open-below)
    '("O" . meow-open-above)
-   '("p" . my/meow-paste)
+   '("p" . my/meow-paste-below)
+   '("P" . my/meow-paste-above)
    '("C-v" . my/meow-paste)
    '("q" . meow-quit)
    '("r" . meow-replace)
@@ -311,14 +312,24 @@
 (global-set-key (kbd "TAB") #'my/smart-tab)
 (global-set-key (kbd "<tab>") #'my/smart-tab)
 
-(defun my/meow-paste ()
-  "Replace selection if active with system clipboard, otherwise paste."
+(defun my/meow-paste-below ()
+  "Paste below current line, replacing selection if active."
   (interactive)
   (if (use-region-p)
       (progn
         (delete-region (region-beginning) (region-end))
         (clipboard-yank))
+    (end-of-line)
+    (newline)
     (clipboard-yank)))
+
+(defun my/meow-paste-above ()
+  "Paste above current line."
+  (interactive)
+  (beginning-of-line)
+  (clipboard-yank)
+  (newline)
+  (forward-line -1))
 
 (defun my/indent-right ()
   "Indent region or line right."
