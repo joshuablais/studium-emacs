@@ -122,6 +122,11 @@
 
   (meow-motion-define-key
    '("e" . meow-prev)
+   '("n" . meow-next)
+   '("h" . meow-left)
+   '("f" . flash-jump)
+   '("/" . consult-line)
+   '("g" . meow-cancel-selection)
    '("<escape>" . ignore))
 
   (meow-normal-define-key
