@@ -124,12 +124,12 @@
 
   (meow-motion-define-key
    ;; Navigation
-   '("e" . meow-prev)
    '("W" . meow-next-work)
    '("B" . meow-back-word)
    '("L" . meow-goto-line)
    '("^" . back-to-indentation)
    ;; Selection
+   '("L" . (lambda () (interactive) (meow-line 1) (meow-reverse)))
    '("l" . meow-line)
    '("M" . meow-mark-symbol)
    '("v" . meow-search)
@@ -174,8 +174,6 @@
    '("c" . meow-change)
    '("C" . (lambda () (interactive) (meow-kill) (meow-insert)))
    '("d" . studium/clipboard-kill-line-or-fold)
-   '("D" . meow-kill)
-   '("e" . meow-prev)
    '("E" . meow-prev-expand)
    '("f" . flash-jump)
    '("g" . meow-cancel-selection)
@@ -186,10 +184,9 @@
    '("I" . (lambda () (interactive) (beginning-of-line) (meow-insert)))
    '("j" . meow-join)
    '("l" . meow-line)
-   '("L" . meow-goto-line)
+   '("L" . (lambda () (interactive) (meow-line 1) (meow-reverse)))
    '("m" . meow-mark-word)
    '("M" . meow-mark-symbol)
-   '("n" . meow-next)
    '("N" . meow-next-expand)
    '("o" . meow-open-below)
    '("O" . meow-open-above)
@@ -228,6 +225,7 @@
           (org-mode . normal)
           (elfeed-show-mode . motion)
           (erc-mode . insert)
+          (vterm-mode . insert)
           (pdf-view-mode . motion)
           (calibredb-search-mode . motion)
           (dirvish-mode . motion)
