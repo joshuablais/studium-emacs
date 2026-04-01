@@ -179,7 +179,7 @@
    '("B" . meow-back-symbol)
    '("c" . meow-change)
    '("C" . (lambda () (interactive) (meow-kill) (meow-insert)))
-   '("d" . meow-clipboard-kill)
+   '("d" . studium/clipboard-kill-line-or-fold)
    '("D" . meow-kill)
    '("e" . meow-prev)
    '("E" . meow-prev-expand)
@@ -251,6 +251,17 @@
   :config
   (meow-setup)
   (meow-global-mode 1))
+
+(defun studium/clipboard-kill-line-or-fold ()
+  "Kill line to clipboard. If the line has a folded region, kill the entire fold."
+  (interactive)
+  (let* ((eol (line-end-position))
+         (fold-ov (seq-find (lambda (o) (overlay-get o 'invisible))
+                            (overlays-in eol (1+ eol)))))
+    (if fold-ov
+        (clipboard-kill-region (line-beginning-position)
+                               (1+ (overlay-end fold-ov)))
+      (meow-clipboard-kill))))
 
 (defun my/smart-tab ()
   "Smart tab: minibuffer complete, org-cycle, corfu, region indent, or indent to mode."
