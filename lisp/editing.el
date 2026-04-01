@@ -5,12 +5,12 @@
   :ensure t
   :config
   (meow-normal-define-key
-   '("zo" . kirigami-open-fold)
-   '("zO" . kirigami-open-fold-rec)
-   '("zc" . kirigami-close-fold)
-   '("za" . kirigami-toggle-fold)
-   '("zr" . kirigami-open-folds)
-   '("zm" . kirigami-close-folds)))
+   '("z o" . kirigami-open-fold)
+   '("z O" . kirigami-open-fold-rec)
+   '("z c" . kirigami-close-fold)
+   '("z a" . kirigami-toggle-fold)
+   '("z r" . kirigami-open-folds)
+   '("z m" . kirigami-close-folds)))
 
 ;; global formatting
 (use-package apheleia
