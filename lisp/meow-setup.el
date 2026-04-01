@@ -42,6 +42,8 @@
 
    ;; Org
    '("X" . org-capture)
+   '("n r i" . org-roam-capture)
+   '("n r f" . org-roam-node-find)
 
    ;; Magit
    '("G" . (lambda () (interactive) (require 'magit) (magit-status)))
