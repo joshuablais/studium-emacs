@@ -3,26 +3,6 @@
 ;; Leader map — bound to SPC in meow-setup.el via meow-normal/motion-define-key
 (defvar my-leader-map (make-sparse-keymap) "Primary leader keymap.")
 
-;; Buffer
-(define-key my-leader-map (kbd "b k") (lambda () (interactive) (kill-buffer (current-buffer))))
-(define-key my-leader-map (kbd "b l") #'my/switch-to-last-buffer)
-(define-key my-leader-map (kbd "b b") #'switch-to-buffer)
-(define-key my-leader-map (kbd "b n") #'next-buffer)
-(define-key my-leader-map (kbd "b i") #'ibuffer)
-
-;; Files and buffers
-(define-key my-leader-map (kbd ".") #'find-file)
-(define-key my-leader-map (kbd ",") #'consult-buffer)
-(define-key my-leader-map (kbd "/") #'consult-ripgrep)
-(define-key my-leader-map (kbd "f r") #'consult-recent-file)
-
-;; Project
-(define-key my-leader-map (kbd "SPC") #'project-find-file)
-(define-key my-leader-map (kbd "p R") #'project-query-replace-regexp)
-
-;; Search
-(define-key my-leader-map (kbd "s o") #'universal-launcher--web-search)
-
 ;; Paste into minibuffer
 (define-key minibuffer-local-map (kbd "C-S-v") #'yank)
 
@@ -61,13 +41,6 @@
 (global-set-key (kbd "C-=") #'text-scale-increase)
 (global-set-key (kbd "C--") #'text-scale-decrease)
 
-;; Bookmarks
-(define-key my-leader-map (kbd "b m") #'bookmark-set)
-(define-key my-leader-map (kbd "b P") #'bookmark-save)
-(define-key my-leader-map (kbd "b D") #'bookmark-delete)
-(define-key my-leader-map (kbd "RET") #'bookmark-jump)
-(define-key my-leader-map (kbd "o b") #'browse-url-of-file)
-(define-key my-leader-map (kbd "x")   #'org-capture)
 
 ;; Save
 (global-set-key (kbd "C-s") #'save-buffer)

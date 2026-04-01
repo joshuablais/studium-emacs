@@ -5,14 +5,34 @@
 
   (meow-leader-define-key
    '("?" . meow-cheatsheet)
+   ;; Files and Consult
    '("." . find-file)
-   '("," . consult-buffer)
+   '("/" . consult-ripgrep)
    '("f r" . consult-recent-file)
+   ;; Projects
+   '("SPC" . project-find-file)
+   '("p R" . project-query-replace-regexp)
    ;; Window bindings
    '("w v" . split-window-right)
    '("w s" . split-window-below)
    '("w d" . delete-window)
    ;; Buffer
+   '("," . consult-buffer)
+   '("b k" . (lambda () (interactive) (kill-buffer (current-buffer))))
+   '("b l" . (lambda () (interactive) (switch-to-buffer nil)))
+   '("b b" . switch-to-buffer)
+   '("b n" . next-buffer)
+   '("b i" . ibuffer)
+   ;; Bookmarks
+   '("b m" . bookmark-set)
+   '("b P" . bookmark-save)
+   '("b D" . bookmark-delete)
+   '("RET" . bookmark-jump)
+   '("o b" . browse-url-of-file)
+   ;; Org
+   '("x" . org-capture)
+   ;; universal-launcher
+   '("s o" . universal-launcher--web-search)
    '("1" . meow-digit-argument)
    '("2" . meow-digit-argument)
    '("3" . meow-digit-argument)
@@ -23,6 +43,7 @@
    '("8" . meow-digit-argument)
    '("9" . meow-digit-argument)
    '("0" . meow-digit-argument))
+
 
   (meow-motion-define-key
    '("e" . meow-prev)
@@ -45,14 +66,14 @@
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
    '("]" . meow-end-of-thing)
-   '("/" . meow-visit)
+   '("/" . consult-line)
    '("a" . meow-append)
    '("A" . meow-open-below)
    '("b" . meow-back-word)
    '("B" . meow-back-symbol)
    '("c" . meow-change)
    '("d" . meow-clipboard-kill)
-   '("e" . meow-prev)
+   ;; '("e" . meow-prev)
    '("E" . meow-prev-expand)
    '("f" . flash-jump)
    '("g" . meow-cancel-selection)
@@ -66,10 +87,10 @@
    '("L" . meow-goto-line)
    '("m" . meow-mark-word)
    '("M" . meow-mark-symbol)
-   '("n" . meow-next)
+   ;; '("n" . meow-next)
    '("N" . meow-next-expand)
    '("o" . meow-open-below)
-   '("O" . meow-to-block)
+   '("O" . meow-open-above)
    '("p" . meow-clipboard-yank)
    '("q" . meow-quit)
    '("r" . meow-replace)
