@@ -206,7 +206,7 @@
    '("s" . meow-change-char)
    '("S" . meow-pop-selection)
    '("t" . meow-till)
-   '("u" . meow-undo)
+   '("u" . undo-tree-undo)
    '("U" . meow-undo-in-selection)
    '("v" . meow-search)
    '("V" . meow-visit)
@@ -257,6 +257,8 @@
   (cond
    ((derived-mode-p 'org-mode) (org-cycle))
    ((derived-mode-p 'magit-mode) (call-interactively #'magit-section-toggle))
+   ((derived-mode-p 'dired-mode) (dirvish-subtree-toggle))
+   ((derived-mode-p 'dirvish-mode) (dirvish-subtree-toggle))
    ((and (bound-and-true-p corfu-mode)
          (frame-live-p (bound-and-true-p corfu--frame))) (corfu-next))
    ((use-region-p) (indent-region (region-beginning) (region-end)))
@@ -348,7 +350,7 @@
 (global-set-key (kbd "C-v") #'clipboard-yank)
 (define-key minibuffer-local-map (kbd "C-v") #'yank)
 (global-set-key (kbd "C-s") #'save-buffer)
-(global-set-key (kbd "C-r") #'undo-redo)
+(global-set-key (kbd "C-r") #'undo-tree-redo)
 
 ;; Reload config
 (defun my/reload-config ()
