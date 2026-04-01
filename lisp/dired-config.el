@@ -11,7 +11,54 @@
   (dired-create-destination-dirs 'ask)
   (delete-by-moving-to-trash t))
 
-;; Omit dot/hiddenfiles by default
+;; inotify-based auto-revert calling dirvish's own revert function
+(defvar-local my/dired-file-watch nil
+  "File watch descriptor for current dired buffer.")
+
+(defun my/dired-setup-file-watch ()
+  "Watch a directory with inotify and revert on change."
+  (let ((dir default-directory)
+        (buf (current-buffer)))
+    (when (and (featurep 'filenotify)
+               (file-directory-p dir)
+               (not my/dired-file-watch))
+      (setq my/dired-file-watch
+            (file-notify-add-watch
+             dir
+             '(change)
+             (lambda (_event)
+               (when (buffer-live-p buf)
+                 (with-current-buffer buf
+                   (if (fboundp 'dirvish-revert)
+                       (dirvish-revert nil t)
+                     (dired-revert nil t)))))))
+      (add-hook 'kill-buffer-hook #'my/dired-remove-file-watch nil t))))
+
+(defun my/dired-remove-file-watch ()
+  "Clean up inotify watch when buffer is killed."
+  (when my/dired-file-watch
+    (file-notify-rm-watch my/dired-file-watch)
+    (setq my/dired-file-watch nil)))
+
+(defun my/dired-watch-subtree ()
+  "Add inotify watch for a just-expanded subtree directory."
+  (let ((dir (dired-get-filename nil t)))
+    (when (and dir (file-directory-p dir))
+      (let ((buf (current-buffer)))
+        (file-notify-add-watch
+         dir
+         '(change)
+         (lambda (_event)
+           (when (buffer-live-p buf)
+             (with-current-buffer buf
+               (if (fboundp 'dirvish-revert)
+                   (dirvish-revert nil t)
+                 (dired-revert nil t))))))))))
+
+(add-hook 'dired-mode-hook #'my/dired-setup-file-watch)
+(advice-add 'dirvish-subtree-toggle :after #'my/dired-watch-subtree)
+
+;; Omit dot/hidden files by default
 (use-package dired-x
   :ensure nil
   :hook (dired-mode . dired-omit-mode)
@@ -52,13 +99,14 @@
   (define-key dirvish-mode-map (kbd "TAB")     #'dirvish-subtree-toggle)
   (define-key dirvish-mode-map (kbd "S-TAB")   #'dirvish-subtree-toggle)
   (define-key dired-mode-map (kbd "m")         #'dired-mark)
+  (define-key dired-mode-map (kbd "i")         #'wdired-change-to-wdired-mode)
   (define-key dired-mode-map (kbd "u")         #'dired-unmark)
   (define-key dired-mode-map (kbd "D")         #'dired-flag-file-deletion)
   (define-key dired-mode-map (kbd "R")         #'dired-do-rename)
   (define-key dired-mode-map (kbd "C")         #'dired-do-copy)
   (define-key dired-mode-map (kbd "q")         #'dirvish-quit)
   (define-key dired-mode-map (kbd ".")         #'dired-omit-mode)
-  (define-key dired-mode-map (kbd "G")       #'revert-buffer))
+  (define-key dired-mode-map (kbd "G")         #'revert-buffer))
 
 (custom-set-faces
  '(dirvish-hl-line-inactive ((t (:background "#171a1e"))))

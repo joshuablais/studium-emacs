@@ -123,9 +123,6 @@
   (meow-motion-define-key
    ;; Navigation
    '("e" . meow-prev)
-   '("n" . meow-next)
-   '("h" . meow-left)
-   '("i" . meow-right-expand)
    '("w" . meow-next-word)
    '("W" . meow-next-symbol)
    '("b" . meow-back-word)
@@ -134,14 +131,11 @@
    '("^" . back-to-indentation)
    ;; Selection
    '("l" . meow-line)
-   '("m" . meow-mark-word)
    '("M" . meow-mark-symbol)
    '("v" . meow-search)
    '("V" . meow-visit)
    '("%" . meow-block)
    '(";" . meow-reverse)
-   '("," . meow-inner-of-thing)
-   '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
    '("]" . meow-end-of-thing)
    ;; Yank
