@@ -47,6 +47,6 @@ The full, untruncated text is always copied - truncation is only for display."
       (message "Copied to clipboard: %s"
                (truncate-string-to-width selected 50 nil nil "...")))))
 
-(define-key my-leader-map (kbd "y y") #'jb/clipboard-manager)
+;; (define-key my-leader-map (kbd "y y") #'jb/clipboard-manager)
 
 (provide 'jb-clipboard-manager)

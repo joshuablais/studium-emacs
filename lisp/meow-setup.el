@@ -1,6 +1,6 @@
 ;;; meow-setup.el --- Description -*- lexical-binding: t; -*-
 
-(defvar my-leader-map (make-sparse-keymap) "Primary leader keymap.")
+;; (defvar my-leader-map (make-sparse-keymap) "Primary leader keymap.")
 
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak-dh)
@@ -40,7 +40,7 @@
    '("o b" . browse-url-of-file)
 
    ;; Org
-   '("x" . org-capture)
+   '("X" . org-capture)
 
    ;; Magit
    '("G" . (lambda () (interactive) (require 'magit) (magit-status)))
@@ -48,6 +48,11 @@
    ;; Miscellaneous
    '("!" . jb/run-command)
    '("o t" . my/vterm)
+   '("s T" . powerthesaurus-lookup-synonyms-dwim)
+   '("s t" . dictionary-search)
+   '("t z" . my/zen-mode)
+   '("o m" . mu4e)
+   '("y m" . mu4e-org-mode)
    '("o d" . dirvish)
    '("e r" . my/erc-connect)
    '("e w" . eww)
@@ -57,6 +62,10 @@
    '("e g" . gptel)
    '("e s" . gptel-send)
    '("s o" . universal-launcher--web-search)
+   '("s l" . link-hint-open-link)
+   '("B" . my/scratch-popup)
+   '("j c" . my/jitsi-create-room)
+   '("y y" . jb/clipboard-manager)
 
    ;; Workspaces
    '("<TAB> s" . easysession-save)
@@ -72,7 +81,14 @@
    '("<TAB> ]" . tab-bar-switch-to-next-tab)
    '("p p" . +workspace/switch-to-project)
 
-   ;; Misc
+   ;; Testing
+   '("m t a" . my/test-all)
+   '("m t f" . my/test-file)
+   '("m t t" . my/test-at-point)
+   '("m t s" . my/test-single)
+   '("m t r" . my/test-rerun)
+   '("m t b" . my/bench-all)
+   '("m t p" . my/bench-at-point)
 
    ;; Emms
    '("m u" . my/update-emms-from-mpd)

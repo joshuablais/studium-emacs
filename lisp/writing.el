@@ -47,20 +47,16 @@
       (text-scale-set 1)
       (setq cursor-type 'bar))))
 
-(define-key my-leader-map (kbd "t z") #'my/zen-mode)
+;; (define-key my-leader-map (kbd "t z") #'my/zen-mode)
 
 ;; Dictionary - built-in, just bind it properly
 (use-package dictionary
   :ensure nil
-  :config
-  (define-key my-leader-map (kbd "s t") #'dictionary-search)
   :custom
   (dictionary-server "dict.org"))
 
 ;; Synonyms via powerthesaurus (online, no system deps)
 (use-package powerthesaurus
-  :ensure t
-  :config
-  (define-key my-leader-map (kbd "s T") #'powerthesaurus-lookup-synonyms-dwim))
+  :ensure t)
 
 (provide 'writing)

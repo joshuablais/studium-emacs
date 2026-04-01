@@ -29,9 +29,7 @@
 
 ;; link hint search and jump
 (use-package link-hint
-  :ensure t
-  :config
-  (define-key my-leader-map (kbd "s l") #'link-hint-open-link))
+  :ensure t)
 
 ;; scratch buffer
 (use-package persistent-scratch
@@ -57,8 +55,6 @@
       (window-height . 0.3)
       (window-parameters . ((no-delete-other-windows . t)))))))
 
-(define-key my-leader-map (kbd "X") #'my/scratch-popup)
-(which-key-add-key-based-replacements "SPC X" "scratch popup")
 
 ;; Messages buffer
 (defun my/messages-popup ()
