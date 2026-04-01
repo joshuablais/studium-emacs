@@ -73,8 +73,6 @@
         (window-height . 0.3)
         (window-parameters . ((no-delete-other-windows . t))))))))
 
-(define-key my-leader-map (kbd "o t") #'my/vterm)
-
 ;; Tag initial frame as main so hooks can skip it
 (defun my/tag-initial-frame ()
   "Tag the first frame as main."
@@ -137,8 +135,6 @@
       ("shell-command" (shell-command cmd))
       ("async-shell-command" (async-shell-command cmd))
       ("eshell-command" (eshell-command cmd)))))
-
-(define-key my-leader-map (kbd "!") #'jb/run-command)
 
 (provide 'vterm-config)
 ;;; vterm.el ends here

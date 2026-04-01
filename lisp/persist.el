@@ -7,9 +7,4 @@
   :config
   (easysession-setup))
 
-(define-key my-leader-map (kbd "<TAB> s") #'easysession-save)
-(define-key my-leader-map (kbd "<TAB> l") #'easysession-switch-to)
-(define-key my-leader-map (kbd "<TAB> R") #'easysession-rename)
-(define-key my-leader-map (kbd "<TAB> D") #'easysession-delete)
-
 (provide 'persist)

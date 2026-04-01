@@ -166,7 +166,6 @@
 (add-to-list 'load-path (expand-file-name "lisp/custom/" user-emacs-directory))
 
 (require 'meow-setup)
-(require 'meow-keys)
 (require 'dashboard)
 (require 'magit-config)
 (require 'mail)

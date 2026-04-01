@@ -10,8 +10,6 @@
 
 (use-package magit
   :defer t
-  :bind (:map my-leader-map
-              ("g g" . magit-status))
   :config
   (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
         magit-bury-buffer-function #'magit-restore-window-configuration))
