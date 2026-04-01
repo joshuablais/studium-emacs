@@ -123,10 +123,8 @@
   (meow-motion-define-key
    ;; Navigation
    '("e" . meow-prev)
-   '("w" . meow-next-word)
-   '("W" . meow-next-symbol)
-   '("b" . meow-back-word)
-   '("B" . meow-back-symbol)
+   '("W" . meow-next-work)
+   '("B" . meow-back-word)
    '("L" . meow-goto-line)
    '("^" . back-to-indentation)
    ;; Selection
@@ -235,6 +233,7 @@
           (help-mode . motion)
           (info-mode . motion)
           (occur-mode . motion)
+          (pass-mode . motion)
           (grep-mode . motion)
           (compilation-mode . motion)
           (messages-buffer-mode . motion)
