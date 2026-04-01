@@ -17,6 +17,7 @@
 (add-hook 'git-commit-mode-hook #'meow-insert)
 
 (with-eval-after-load 'magit
+  (define-key magit-status-mode-map (kbd "p") #'magit-push)
   (define-key magit-status-mode-map (kbd "SPC") nil)
   (define-key magit-log-mode-map (kbd "SPC") nil)
   (define-key magit-diff-mode-map (kbd "SPC") nil))
