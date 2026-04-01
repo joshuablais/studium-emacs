@@ -1,5 +1,6 @@
 ;;; meow-setup.el --- Description -*- lexical-binding: t; -*-
 
+;; Setup if there are any leader keys breaking
 ;; (defvar my-leader-map (make-sparse-keymap) "Primary leader keymap.")
 
 (defun meow-setup ()
@@ -170,8 +171,8 @@
    '("N" . meow-next-expand)
    '("o" . meow-open-below)
    '("O" . meow-open-above)
-   '("p" . meow-clipboard-yank)
-   '("C-v" . meow-clipboard-yank)
+   '("p" . my/meow-paste)
+   '("C-v" . my/meow-paste)
    '("q" . meow-quit)
    '("r" . meow-replace)
    '("s" . meow-change-char)
@@ -203,7 +204,14 @@
           (erc-mode . motion)
           (pdf-view-mode . motion)
           (calibredb-search-mode . motion)
-          (dirvish-mode . motion))))
+          (dirvish-mode . motion)
+          (help-mode . motion)
+          (info-mode . motion)
+          (occur-mode . motion)
+          (grep-mode . motion)
+          (compilation-mode . motion)
+          (messages-buffer-mode . motion)
+          (special-mode . motion))))
 
 (use-package meow
   :demand t
@@ -211,7 +219,16 @@
   (meow-setup)
   (meow-global-mode 1))
 
-                                        ; Save all buffers
+(defun my/meow-paste ()
+  "Replace selection if active with system clipboard, otherwise paste."
+  (interactive)
+  (if (use-region-p)
+      (progn
+        (delete-region (region-beginning) (region-end))
+        (clipboard-yank))
+    (clipboard-yank)))
+
+;;Save all buffers
 (defun my/save-all-buffers ()
   "Save all modified buffers without prompting."
   (interactive)
