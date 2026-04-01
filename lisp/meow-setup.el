@@ -243,7 +243,33 @@
   :demand t
   :config
   (meow-setup)
-  (meow-global-mode 1))
+  (meow-global-mode 1)
+  (meow-thing-register 'angle
+                       '(regexp "<" ">")
+                       '(regexp "<" ">"))
+  (meow-thing-register 'double-quote
+                       '(regexp "\"" "\"")
+                       '(regexp "\"" "\""))
+  (meow-thing-register 'single-quote
+                       '(regexp "'" "'")
+                       '(regexp "'" "'"))
+  (meow-thing-register 'backtick
+                       '(regexp "`" "`")
+                       '(regexp "`" "`"))
+  (setq meow-char-thing-table
+        '((?\( . round)
+          (?\[ . square)
+          (?\{ . curly)
+          (?\< . angle)
+          (?\" . double-quote)
+          (?\' . single-quote)
+          (?\` . backtick)
+          (?e . symbol)
+          (?w . window)
+          (?b . buffer)
+          (?p . paragraph)
+          (?l . line)
+          (?d . defun))))
 
 (defun studium/clipboard-kill-line-or-fold ()
   "Kill line to clipboard. If the line has a folded region, kill the entire fold."
