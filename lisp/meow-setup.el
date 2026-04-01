@@ -217,7 +217,7 @@
    '("y" . meow-clipboard-save)
    '("z o" . kirigami-open-fold)
    '("z O" . kirigami-open-fold-rec)
-   '("z c" . kirigami-open-close-rec)
+   '("z c" . kirigami-close-fold)
    '("z a" . kirigami-toggle-fold)
    '("z r" . kirigami-open-folds)
    '("z m" . kirigami-close-folds)
