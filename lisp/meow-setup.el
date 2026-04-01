@@ -261,10 +261,11 @@
   "Smart tab: minibuffer complete, org-cycle, corfu, region indent, or indent to mode."
   (interactive)
   (cond
+   ((and (minibufferp) (bound-and-true-p vertico-mode))
+    (vertico-insert))
    ((minibufferp)
     (minibuffer-complete))
-   ((and (derived-mode-p 'org-mode)
-         (meow-normal-mode-p))
+   ((derived-mode-p 'org-mode)
     (org-cycle))
    ((and (derived-mode-p 'magit-mode)
          (fboundp 'magit-section-toggle))
