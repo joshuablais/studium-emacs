@@ -82,6 +82,12 @@
   (eglot-sync-connect       nil) ; non-blocking LSP connect
   (eglot-extend-to-xref     t))  ; LSP context follows xref jumps
 
+;; auto fromat on save
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (bound-and-true-p eglot--managed-mode)
+              (eglot-format-buffer))))
+
 ;; ELDOC BOX
 (use-package eldoc-box
   :ensure t

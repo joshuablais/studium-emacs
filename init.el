@@ -199,8 +199,8 @@
 (require 'gnus-config)
 (require 'tools)
 
-;; (with-eval-after-load 'org
-;;   (require 'org-config))
+(with-eval-after-load 'org
+  (require 'org-config))
 
 (require 'jitsi-meeting)
 (require 'universal-launcher)

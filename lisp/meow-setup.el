@@ -221,8 +221,11 @@
    '("z a" . kirigami-toggle-fold)
    '("z r" . kirigami-open-folds)
    '("z m" . kirigami-close-folds)
+   '(">" . my/indent-right)
+   '("<" . my/indent-left)
    '("'" . repeat)
-   '("<tab>" . indent-for-tab-command)
+   '("<tab>" . my/smart-tab)
+   '("TAB" . my/smart-tab)
    '("<escape>" . ignore))
 
   (setq meow-mode-state-list
@@ -248,6 +251,20 @@
   (meow-setup)
   (meow-global-mode 1))
 
+(defun my/smart-tab ()
+  "Smart tab: org-cycle, corfu, region indent, or indent to mode."
+  (interactive)
+  (cond
+   ((derived-mode-p 'org-mode) (org-cycle))
+   ((derived-mode-p 'magit-mode) (call-interactively #'magit-section-toggle))
+   ((and (bound-and-true-p corfu-mode)
+         (frame-live-p (bound-and-true-p corfu--frame))) (corfu-next))
+   ((use-region-p) (indent-region (region-beginning) (region-end)))
+   (t (indent-according-to-mode))))
+
+(global-set-key (kbd "TAB") #'my/smart-tab)
+(global-set-key (kbd "<tab>") #'my/smart-tab)
+
 (defun my/meow-paste ()
   "Replace selection if active with system clipboard, otherwise paste."
   (interactive)
@@ -256,6 +273,20 @@
         (delete-region (region-beginning) (region-end))
         (clipboard-yank))
     (clipboard-yank)))
+
+(defun my/indent-right ()
+  "Indent region or line right."
+  (interactive)
+  (if (use-region-p)
+      (indent-rigidly (region-beginning) (region-end) tab-width)
+    (indent-rigidly (line-beginning-position) (line-end-position) tab-width)))
+
+(defun my/indent-left ()
+  "Indent region or line left."
+  (interactive)
+  (if (use-region-p)
+      (indent-rigidly (region-beginning) (region-end) (- tab-width))
+    (indent-rigidly (line-beginning-position) (line-end-position) (- tab-width))))
 
 ;;Save all buffers
 (defun my/save-all-buffers ()
