@@ -44,6 +44,7 @@
 ;; opens or yasnippet-capf serves nothing on first completion attempt.
 (use-package yasnippet
   :ensure t
+  :demand t
   :config
   (setq yas-snippet-dirs '("~/.config/emacs/snippets")
         yas-verbosity    0)
@@ -51,14 +52,16 @@
 
 (use-package yasnippet-snippets
   :ensure t
+  :demand t
   :after yasnippet)
-
-(elpaca-wait)
 
 (use-package yasnippet-capf
   :ensure t
+  :demand t
   :custom
   (yasnippet-capf-lookup-by 'key))
+
+(elpaca-wait)
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -68,6 +71,9 @@
                               #'cape-file
                               #'pcomplete-completions-at-point
                               #'ispell-completion-at-point))))
+
+;; See go-mode snippets
+(add-hook 'go-ts-mode-hook #'(lambda () (yas-activate-extra-mode 'go-mode)))
 
 ;; EGLOT
 (use-package eglot
