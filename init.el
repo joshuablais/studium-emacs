@@ -119,10 +119,17 @@
 (set-fringe-mode 10)
 (add-to-list 'custom-theme-load-path
              (expand-file-name "themes/" user-emacs-directory))
+
 (use-package doom-themes
   :demand t
   :config
   (load-theme 'compline t))
+
+(defun my/set-theme (variant)
+  (mapc #'disable-theme custom-enabled-themes)
+  (if (string= variant "dark")
+      (load-theme 'compline t)
+    (load-theme 'lauds t)))
 
 (with-eval-after-load 'hl-line
   (set-face-attribute 'hl-line nil

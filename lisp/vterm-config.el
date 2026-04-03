@@ -40,17 +40,19 @@
   (add-hook 'vterm-mode-hook #'meow-insert-mode)
 
   (define-key vterm-mode-map (kbd "<escape>")
-    (lambda () (interactive)
-      (meow-normal-mode)
-      (vterm-copy-mode 1)))
+              (lambda () (interactive)
+                (meow-normal-mode)
+                (vterm-copy-mode 1)))
 
   (define-key vterm-copy-mode-map (kbd "i")
-    (lambda () (interactive)
-      (vterm-copy-mode -1)
-      (meow-insert-mode)))
+              (lambda () (interactive)
+                (vterm-copy-mode -1)
+                (meow-insert-mode)))
 
   (define-key vterm-copy-mode-map (kbd "y") #'meow-clipboard-save)
   (define-key vterm-copy-mode-map (kbd "l") #'meow-line)
+  (define-key vterm-copy-mode-map (kbd "L")
+              (lambda () (interactive) (meow-line 1) (meow-reverse)))
   (define-key vterm-copy-mode-map (kbd "m") #'meow-mark-word)
   (define-key vterm-copy-mode-map (kbd "f") #'flash-jump)
   (define-key vterm-copy-mode-map (kbd "/") #'consult-line)
@@ -64,9 +66,9 @@
   (define-key vterm-copy-mode-map (kbd "V") #'meow-visit)
   (define-key vterm-copy-mode-map (kbd "g") #'meow-cancel-selection)
   (define-key vterm-copy-mode-map (kbd "<escape>")
-    (lambda () (interactive)
-      (vterm-copy-mode -1)
-      (meow-insert-mode)))
+              (lambda () (interactive)
+                (vterm-copy-mode -1)
+                (meow-insert-mode)))
 
   ;; Auto-spawn vterm in any new frame that isn't main or explicitly handled
   (defun my/vterm-in-new-frame (frame)

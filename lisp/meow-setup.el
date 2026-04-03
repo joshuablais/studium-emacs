@@ -55,6 +55,7 @@
    ;; Miscellaneous
    '("!" . jb/run-command)
    '("o t" . my/vterm)
+   '("o T" . vterm)
    '("s T" . powerthesaurus-lookup-synonyms-dwim)
    '("s t" . dictionary-search)
    '("t z" . my/zen-mode)
