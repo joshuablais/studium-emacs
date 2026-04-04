@@ -48,6 +48,7 @@
 
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
+
 (elpaca-wait)
 
 (setq use-package-always-defer t
@@ -67,7 +68,9 @@
   :config
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
-  (elpaca-wait) ; block until no-littering is fully built and configured
+
+(elpaca-wait)
+
 (when (file-exists-p custom-file)
   (load custom-file))
 
@@ -115,6 +118,21 @@
       auto-save-interval 300
       auto-save-timeout 30)
 
+(use-package savehist
+  :ensure nil
+  :config
+  (setq history-length 1000
+        history-delete-duplicates t
+        savehist-save-minibuffer-history t)
+  (dolist (var '(extended-command-history
+                 search-ring
+                 regexp-search-ring
+                 consult--buffer-history
+                 recentf-list))
+    (add-to-list 'savehist-additional-variables var)))
+
+(elpaca-wait)
+
 ;; UI
 (set-fringe-mode 10)
 (add-to-list 'custom-theme-load-path
@@ -138,8 +156,9 @@
                       :extend t))
 
 (use-package which-key
+  :demand t
   :config
-  (setq which-key-idle-delay 0.2)
+  (setq which-key-idle-delay 0.1)
   (which-key-mode 1))
 
 (use-package recentf
@@ -152,21 +171,6 @@
   (add-to-list 'recentf-exclude (recentf-expand-file-name no-littering-var-directory))
   (add-to-list 'recentf-exclude (recentf-expand-file-name no-littering-etc-directory))
   (add-hook 'kill-emacs-hook #'recentf-cleanup -90))
-
-(use-package savehist
-  :ensure nil
-  :config
-  (setq history-length 1000
-        history-delete-duplicates t
-        savehist-save-minibuffer-history t)
-  (dolist (var '(extended-command-history
-                 search-ring
-                 regexp-search-ring
-                 consult--buffer-history
-                 recentf-list))
-    (add-to-list 'savehist-additional-variables var)))
-
-(elpaca-wait)
 
 ;; Modules
 (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))

@@ -131,9 +131,7 @@
    ;; Navigation
    '("W" . meow-next-work)
    '("B" . meow-back-word)
-   '("L" . meow-goto-line)
    '("^" . back-to-indentation)
-   ;; Selection
    '("L" . (lambda () (interactive) (meow-line 1) (meow-reverse)))
    '("l" . meow-line)
    '("M" . meow-mark-symbol)
