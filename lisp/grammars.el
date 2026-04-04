@@ -81,6 +81,7 @@
   :hook ((go-ts-mode     . eglot-ensure)
          (python-ts-mode . eglot-ensure)
          (js-ts-mode     . eglot-ensure)
+         (nix-ts-mode     . eglot-ensure)
          (templ-ts-mode  . eglot-ensure))
   :custom
   (eglot-autoshutdown       t)

@@ -200,7 +200,7 @@
    '("C-v" . my/meow-paste)
    '("q" . meow-quit)
    '("r" . meow-replace)
-   '("s" . meow-change-char)
+   ;; '("s" . meow-change-char)
    '("S" . meow-pop-selection)
    '("t" . meow-till)
    '("u" . undo-tree-undo)
