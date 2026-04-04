@@ -373,8 +373,8 @@
 (global-set-key (kbd "C-x C-r") #'eval-region)
 
 ;; Set register jumppoints
-(global-set-key (kbd "C-c m") #'point-to-register)
-(global-set-key (kbd "C-c j") #'jump-to-register)
+(global-set-key (kbd "C-c M") #'point-to-register)
+(global-set-key (kbd "C-c J") #'jump-to-register)
 
 ;; Window movement
 (global-set-key (kbd "C-w") #'backward-kill-word)
