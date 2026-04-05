@@ -193,8 +193,8 @@
    '("N" . meow-next-expand)
    '("o" . meow-open-below)
    '("O" . meow-open-above)
-   '("p" . my/meow-paste-below)
-   '("P" . my/meow-paste-above)
+   '("p" . studium/paste-below)
+   '("P" . studium/paste-above)
    '("C-v" . my/meow-paste)
    '("q" . meow-quit)
    '("r" . meow-replace)
@@ -207,7 +207,7 @@
    '("V" . meow-visit)
    '("w" . meow-next-word)
    '("W" . meow-next-symbol)
-   '("x" . meow-delete)
+   '("x" . studium/kill-char)
    '("X" . meow-backward-delete)
    '("y" . meow-clipboard-save)
    '("z o" . kirigami-open-fold)
@@ -286,6 +286,11 @@
                                (1+ (overlay-end fold-ov)))
       (meow-clipboard-kill))))
 
+(defun studium/kill-char ()
+  "Kills a character adding it to killring, like x in vim"
+  (interactive)
+  (kill-region (point) (1+ (point))))
+
 (defun my/smart-tab ()
   "Smart tab: minibuffer complete, org-cycle, corfu, region indent, or indent to mode."
   (interactive)
@@ -311,24 +316,62 @@
 (global-set-key (kbd "TAB") #'my/smart-tab)
 (global-set-key (kbd "<tab>") #'my/smart-tab)
 
-(defun my/meow-paste-below ()
-  "Paste below current line, replacing selection if active."
+(defun studium/paste-below ()
+  "Vim p: paste after cursor (characterwise) or below current line (linewise)."
   (interactive)
-  (if (use-region-p)
-      (progn
-        (delete-region (region-beginning) (region-end))
-        (clipboard-yank))
-    (end-of-line)
-    (newline)
-    (clipboard-yank)))
+  (when (null kill-ring)
+    (user-error "Kill ring is empty"))
+  (let ((text (current-kill 0)))
+    (cond
+     ;; Active region: replace selection, old selection → kill-ring
+     ((use-region-p)
+      (let ((beg (region-beginning)))
+        (kill-region (region-beginning) (region-end))
+        (insert text)
+        (goto-char beg)))
+     ;; Linewise: paste below current line, cursor to first non-blank
+     ((string-suffix-p "\n" text)
+      (let* ((content (substring text 0 (1- (length text))))
+             (target nil))
+        (end-of-line)
+        (insert "\n")
+        (setq target (point))
+        (insert content)
+        (goto-char target)
+        (back-to-indentation)))
+     ;; Characterwise: paste after cursor, cursor on last pasted char
+     (t
+      (unless (or (eobp) (eolp))
+        (forward-char 1))
+      (insert text)
+      (backward-char 1)))))
 
-(defun my/meow-paste-above ()
-  "Paste above current line."
+(defun studium/paste-above ()
+  "Vim P: paste before cursor (characterwise) or above current line (linewise)."
   (interactive)
-  (beginning-of-line)
-  (clipboard-yank)
-  (newline)
-  (forward-line -1))
+  (when (null kill-ring)
+    (user-error "Kill ring is empty"))
+  (let ((text (current-kill 0)))
+    (cond
+     ;; Active region: replace selection, old selection → kill-ring
+     ((use-region-p)
+      (let ((beg (region-beginning)))
+        (kill-region (region-beginning) (region-end))
+        (insert text)
+        (goto-char beg)))
+     ;; Linewise: paste above current line, cursor to first non-blank
+     ((string-suffix-p "\n" text)
+      (let* ((content (substring text 0 (1- (length text))))
+             (target nil))
+        (beginning-of-line)
+        (setq target (point))
+        (insert content "\n")
+        (goto-char target)
+        (back-to-indentation)))
+     ;; Characterwise: paste before cursor, cursor on last pasted char
+     (t
+      (insert text)
+      (backward-char 1)))))
 
 (defun my/indent-right ()
   "Indent region or line right."

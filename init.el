@@ -86,6 +86,8 @@
 (setq-default
  delete-by-moving-to-trash t
  window-combination-resize t
+ ;; Set global kill-ring
+ save-interprogram-paste-before-kill t
  x-stretch-cursor t)
 
 (setq
