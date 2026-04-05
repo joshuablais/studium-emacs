@@ -455,6 +455,23 @@
 (global-set-key (kbd "C-s") #'save-buffer)
 (global-set-key (kbd "C-r") #'undo-tree-redo)
 
+(defun studium/increment-number (arg)
+  "Increment number at point by ARG."
+  (interactive "p")
+  (save-excursion
+    (skip-chars-backward "0-9")
+    (when (looking-at "[0-9]+")
+      (replace-match
+       (number-to-string (+ arg (string-to-number (match-string 0))))))))
+
+(defun studium/decrement-number (arg)
+  "Decrement number at point by ARG."
+  (interactive "p")
+  (studium/increment-number (- arg)))
+
+(global-set-key (kbd "C-S-<up>") #'studium/increment-number)
+(global-set-key (kbd "C-S-<down>") #'studium/decrement-number)
+
 ;; Reload config
 (defun my/reload-config ()
   (interactive)
