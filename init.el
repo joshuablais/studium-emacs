@@ -151,11 +151,30 @@
       (load-theme 'compline t)
     (load-theme 'lauds t)))
 
-(with-eval-after-load 'hl-line
-  (set-face-attribute 'hl-line nil
-                      :background "#22262b"
-                      :foreground 'unspecified
-                      :extend t))
+(defun my/set-hl-line-face (&rest _)
+  (let ((bg (if (eq (frame-parameter nil 'background-mode) 'dark)
+                "#22262b"
+              "#e0dcd4")))
+    (when (facep 'hl-line)
+      (set-face-attribute 'hl-line nil
+                          :background bg
+                          :foreground 'unspecified
+                          :extend t))
+    (when (facep 'dirvish-hl-line)
+      (set-face-attribute 'dirvish-hl-line nil
+                          :background bg
+                          :foreground 'unspecified
+                          :extend t))
+    (when (facep 'dirvish-hl-line-inactive)
+      (set-face-attribute 'dirvish-hl-line-inactive nil
+                          :background bg
+                          :foreground 'unspecified
+                          :extend t))))
+
+(add-hook 'enable-theme-functions #'my/set-hl-line-face)
+(add-hook 'hl-line-mode-hook #'my/set-hl-line-face)
+(add-hook 'enable-theme-functions #'my/set-hl-line-face)
+(add-hook 'hl-line-mode-hook #'my/set-hl-line-face)
 
 (use-package which-key
   :demand t
@@ -198,6 +217,7 @@
 (require 'test-runner)
 (require 'persist)
 (require 'dired-config)
+(require 'jabber-config)
 (require 'vterm-config)
 (require 'elfeed-config)
 (require 'reading)
@@ -208,13 +228,12 @@
 (require 'spelling)
 (require 'workspaces)
 (require 'everywhere)
-;;(require 'elpher-config)
+(require 'elpher-config)
 (require 'gnus-config)
 (require 'tools)
-
 (with-eval-after-load 'org
   (require 'org-config))
-
+(require 'agenda-custom)
 (require 'jitsi-meeting)
 (require 'universal-launcher)
 (require 'jb-0x0)

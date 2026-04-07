@@ -227,7 +227,7 @@
 
           ("e" "Event" entry
            (file+headline "~/org/calendar.org" "Events")
-           "* %^{Event}\n%^{SCHEDULED}T\n:PROPERTIES:\n:CREATED: %U\n:CAPTURED: %a\n:CONTACT: %(org-capture-ref-link \"~/org/roam/contacts.org\")\n:END:\n%?")
+           "* %^{Event}\n%^{SCHEDULED}T\n:PROPERTIES:\n:CREATED: %U\n:CAPTURED: %a\n:CONTACT: %(org-capture-ref-link \"~/org/contacts.org\")\n:END:\n%?")
 
           ("d" "Deadline" entry
            (file+headline "~/org/calendar.org" "Deadlines")
@@ -238,21 +238,34 @@
            "** [[%^{URL}][%^{Title}]]\n:PROPERTIES:\n:CREATED: %U\n:TAGS: %(org-capture-bookmark-tags)\n:END:\n\n"
            :empty-lines 0)
 
-          ("c" "Contact" entry
-           (file "~/org/roam/contacts.org")
+          ("c" "New Contact" entry
+           (file "~/org/contacts.org")
            "* %^{Name} %^g
 :PROPERTIES:
-:ID: %(org-id-new)
-:CREATED: %U
-:CAPTURED: %a
 :EMAIL: %^{Email}
+:XMPP: %^{XMPP}
+:COMPANY: %^{Company}
 :PHONE: %^{Phone}
-:BIRTHDAY: %^{Birthday (use <YYYY-MM-DD +1y> format)}t
-:LOCATION: %^{Address}
-:LAST_CONTACTED: %U
+:BIRTHDAY: %^{Birthday <YYYY-MM-DD +1y>}
+:LAST_CONTACTED: [%<%Y-%m-%d>]
+:LOCATION: %^{Location}
+:HOW_MET: %^{How met}
+:CATEGORY: %^{Category|client|personal|clergy|professional}
 :END:
+- %U Initial contact
 %?"
            :empty-lines 1)
+
+          ("C" "Contact interaction" item
+           (function (lambda ()
+                       (let ((org-ql-default-predicate 'heading))
+                         (org-ql-search "~/org/contacts.org" (read-string "Contact: "))
+                         (org-agenda-switch-to)
+                         (goto-char (org-entry-end-position)))))
+           "- %U %?"
+           :after-finalize (lambda ()
+                             (org-set-property "LAST_CONTACTED"
+                                               (format-time-string "[%Y-%m-%d]"))))
 
           ("n" "Note" entry
            (file+headline "~/org/notes.org" "Inbox")
@@ -271,7 +284,7 @@
          (window-height . 0.4))))
 
 ;; Contacts
-(defvar my/contacts-file "~/org/roam/contacts.org")
+(defvar my/contacts-file "~/org/contacts.org")
 
 (defun my/contacts-get-emails ()
   "Extract all emails from contacts.org."
