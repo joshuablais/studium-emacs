@@ -383,13 +383,17 @@
 
 (with-eval-after-load 'org
   (setq org-startup-folded 'showeverything
-        org-cycle-emulate-tab t)
+        org-cycle-emulate-tab t
+        org-indent-mode t)
+  (add-hook 'org-mode-hook #'org-indent-mode))
+
+(with-eval-after-load 'org
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("go" . "src go"))
-  (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
-  (add-hook 'org-mode-hook #'org-indent-mode)
-  (add-hook 'org-mode-hook #'display-line-numbers-mode))
+  (add-to-list 'org-structure-template-alist '("sh" . "src sh")))
+
+(add-hook 'org-mode-hook #'display-line-numbers-mode)
 
 ;; DWIM at point
 (with-eval-after-load 'org
@@ -519,8 +523,10 @@
               (org-element-property :end context)))))))))
 
 (use-package ob-go :demand t)
+
 (elpaca-wait)
 
+;; set babel languages, add go
 (with-eval-after-load 'org
   (setq org-src-fontify-natively t)
   (add-to-list 'org-src-lang-modes '("go" . go-ts))
