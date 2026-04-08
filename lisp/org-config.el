@@ -244,13 +244,12 @@
 :PROPERTIES:
 :EMAIL: %^{Email}
 :XMPP: %^{XMPP}
+:LOCATION: %^{Location}
 :COMPANY: %^{Company}
 :PHONE: %^{Phone}
 :BIRTHDAY: %^{Birthday <YYYY-MM-DD +1y>}
 :LAST_CONTACTED: [%<%Y-%m-%d>]
-:LOCATION: %^{Location}
-:HOW_MET: %^{How met}
-:CATEGORY: %^{Category|client|personal|clergy|professional}
+:NOTES: %^{Notes}
 :END:
 - %U Initial contact
 %?"
@@ -258,19 +257,34 @@
 
           ("C" "Contact interaction" item
            (function (lambda ()
-                       (let ((org-ql-default-predicate 'heading))
-                         (org-ql-search "~/org/contacts.org" (read-string "Contact: "))
-                         (org-agenda-switch-to)
-                         (goto-char (org-entry-end-position)))))
-           "- %U %?"
+                       (let* ((buf (or (find-buffer-visiting "~/org/contacts.org")
+                                       (find-file-noselect "~/org/contacts.org")))
+                              (headings (with-current-buffer buf
+                                          (org-map-entries
+                                           (lambda () (cons (org-get-heading t t t t) (point))))))
+                              (choice (completing-read "Contact: " (mapcar #'car headings)))
+                              (pos (cdr (assoc choice headings))))
+                         (switch-to-buffer buf)
+                         (goto-char pos)
+                         (setq jb/--crm-marker (point-marker))
+                         (org-end-of-meta-data t))))
+           "- [%<%Y-%m-%d %a>] %?"
+           :prepend t
            :after-finalize (lambda ()
-                             (org-set-property "LAST_CONTACTED"
-                                               (format-time-string "[%Y-%m-%d]"))))
+                             (when (marker-buffer jb/--crm-marker)
+                               (with-current-buffer (marker-buffer jb/--crm-marker)
+                                 (goto-char jb/--crm-marker)
+                                 (org-set-property "LAST_CONTACTED"
+                                                   (format-time-string "[%Y-%m-%d]"))
+                                 (save-buffer)
+                                 (set-marker jb/--crm-marker nil)))))
 
           ("n" "Note" entry
            (file+headline "~/org/notes.org" "Inbox")
            "* [%<%Y-%m-%d %a>] %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:CAPTURED: %a\n:END:\n%?"
            :prepend t))))
+
+(defvar jb/--crm-marker nil "Marker for CRM contact update.")
 
 (setq display-buffer-alist
       `(("\\*Capture\\*\\|CAPTURE-.*"
