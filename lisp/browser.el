@@ -48,6 +48,6 @@
 ;; Keybinds
 (with-eval-after-load 'eww
   (define-key eww-mode-map (kbd "b") #'eww-back-url)
-  (define-key eww-mode-map (kbd "a") #'eww-add-bookmark))
+  (define-key eww-mode-map (kbd "B") #'eww-add-bookmark))
 
 (provide 'browser)
