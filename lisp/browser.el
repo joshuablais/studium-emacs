@@ -45,4 +45,9 @@
 (setq shr-max-image-size '(800 . 600))  ;; cap image dimensions
 (setq shr-image-animate t)             ;; kill animated gifs entirely
 
+;; Keybinds
+(with-eval-after-load 'eww
+  (define-key eww-mode-map (kbd "b") #'eww-back-url)
+  (define-key eww-mode-map (kbd "a") #'eww-add-bookmark))
+
 (provide 'browser)
