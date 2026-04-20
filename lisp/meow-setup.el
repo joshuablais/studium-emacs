@@ -45,7 +45,7 @@
    '("o b" . browse-url-of-file)
 
    ;; Org
-   '("X" . org-capture)
+   '("C" . org-capture)
    '("n r i" . org-roam-capture)
    '("n r f" . org-roam-node-find)
    '("n j" . org-roam-dailies-capture-today)
