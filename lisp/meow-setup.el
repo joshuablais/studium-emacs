@@ -134,7 +134,6 @@
   (meow-motion-define-key
    ;; Navigation
    '("W" . meow-next-word)
-   '("B" . meow-back-word)
    '("^" . back-to-indentation)
    '("L" . (lambda () (interactive) (meow-line 1) (meow-reverse)))
    '("l" . meow-line)
@@ -177,7 +176,6 @@
    '("a" . meow-append)
    '("A" . (lambda () (interactive) (end-of-line) (meow-insert)))
    '("b" . meow-back-word)
-   '("B" . meow-back-symbol)
    '("c" . meow-change)
    '("C" . (lambda () (interactive) (meow-kill) (meow-insert)))
    '("d" . studium/clipboard-kill-line-or-fold)
