@@ -133,7 +133,7 @@
 
   (meow-motion-define-key
    ;; Navigation
-   '("W" . meow-next-work)
+   '("W" . meow-next-word)
    '("B" . meow-back-word)
    '("^" . back-to-indentation)
    '("L" . (lambda () (interactive) (meow-line 1) (meow-reverse)))

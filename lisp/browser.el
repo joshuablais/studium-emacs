@@ -9,6 +9,29 @@
 ;; set searx instance
 (setq eww-search-prefix "https://searx.labrynth.org/search?q=")
 (setq eww-download-directory (expand-file-name "~/Downloads/"))
+(setq eww-auto-rename-buffer 'title)
+
+;; push sites to lighter versions
+(setq eww-url-transformers
+      '(eww-remove-tracking
+        (lambda (url)
+          (cond
+           ((string-match-p "twitter\\.com" url)
+            (replace-regexp-in-string "twitter\\.com" "nitter.net" url))
+           ((string-match-p "reddit\\.com" url)
+            (replace-regexp-in-string "reddit\\.com" "libreddit.it" url))
+           (t url)))))
+
+;; Syntax hilighting
+(use-package shr-tag-pre-highlight
+  :ensure t
+  :after shr
+  :config
+  (add-to-list 'shr-external-rendering-functions
+               '(pre . shr-tag-pre-highlight)))
+
+(use-package language-detection
+  :ensure t)
 
 (defun my-browse-url-mpv (url &rest _args)
   "Open URL in mpv."
@@ -62,7 +85,7 @@
 (with-eval-after-load 'eww
   (define-key eww-mode-map (kbd "b") #'eww-back-url)
   (define-key eww-mode-map (kbd "a") #'eww-add-bookmark)
-  (define-key eww-mode-map (kbd "W") #'shr-copy-url)
+  (define-key eww-mode-map (kbd "U") #'shr-copy-url)
   (define-key eww-mode-map (kbd "D") #'my/eww-download-image-at-point))
 
 (provide 'browser)
