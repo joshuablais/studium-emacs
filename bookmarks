@@ -1,0 +1,29 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("done.org"
+ (filename . "~/org/done.org")
+ (front-context-string . "#+title: DONE\n:P")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27128 43114 458822 794000))
+("calendar.org"
+ (filename . "~/org/calendar.org")
+ (front-context-string . "* Events\n:PROPER")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27128 43109 75443 461000))
+("inbox.org"
+ (filename . "~/org/inbox.org")
+ (front-context-string . "#+title: Inbox\n\n")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27128 43105 460920 836000))
+("org"
+ (filename . "~/org/")
+ (front-context-string . "inbox.org\n  -rw-")
+ (rear-context-string . "9K May  3 19:47 ")
+ (position . 535)
+ (last-modified 27128 43099 518037 737000))
+)
