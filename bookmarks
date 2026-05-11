@@ -33,7 +33,7 @@
  (rear-context-string . "0K Jul 28  2025 ")
  (position . 1428)
  (last-modified 27126 16059 859805 468000))
-("11. Solene's % gemini capsule - a gemini tech blog (text/gemini • 502 Lines • 53 KiB)"
+("11. Solene's % gemini capsule - a gemini tech blog (text/gemini   502 Lines   53 KiB)"
  (position . 49)
  (location . "gemini://perso.pw/blog/")
  (handler . elpher-bookmark-jump))
@@ -74,11 +74,11 @@
  (position . 103)
  (last-modified 27120 8524 105294 235000))
 ("org-capture-last-stored"
- (filename . "~/org/roam/daily/2026-05-07.org")
- (front-context-string . "* 21:45: \nIn rea")
- (rear-context-string . "letags: :daily:\n")
- (position . 117)
- (last-modified 27133 23734 608307 654000))
+ (filename . "~/org/bookmarks.org")
+ (front-context-string . "** [[https://tra")
+ (rear-context-string . "GS: music\n:END:\n")
+ (position . 21335)
+ (last-modified 27135 21049 963357 522000))
 ("calendar.org"
  (filename . "~/org/calendar.org")
  (front-context-string . "e\n:PROPERTIES:\n:")
