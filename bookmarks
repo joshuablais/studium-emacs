@@ -74,11 +74,11 @@
  (position . 103)
  (last-modified 27120 8524 105294 235000))
 ("org-capture-last-stored"
- (filename . "~/org/bookmarks.org")
- (front-context-string . "** [[https://tra")
- (rear-context-string . "GS: music\n:END:\n")
- (position . 21335)
- (last-modified 27135 21049 963357 522000))
+ (filename . "~/org/roam/daily/2026-05-19.org")
+ (front-context-string . "* 09:15: Guix in")
+ (rear-context-string . "letags: :daily:\n")
+ (position . 116)
+ (last-modified 27148 32500 632012 760000))
 ("calendar.org"
  (filename . "~/org/calendar.org")
  (front-context-string . "e\n:PROPERTIES:\n:")
