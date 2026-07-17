@@ -44,10 +44,10 @@
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
 
-(use-package terraform-ts-mode
-  :ensure nil
-  :mode "\\.tf\\'"
-  :mode "\\.tfvars\\'")
+(use-package terraform-mode
+  :ensure t
+  :mode ("\\.tf\\'" "\\.tfvars\\'")
+  :hook (terraform-mode . eglot-ensure))
 
 ;; YASNIPPET
 ;; No :defer — yas-global-mode must be live before the first eglot buffer
