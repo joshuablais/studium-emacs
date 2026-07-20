@@ -218,7 +218,7 @@
 (require 'flash-config)
 (require 'pass-config)
 (require 'org-caldav-config)
-(require 'markdown)
+;; (require 'markdown)
 (require 'development)
 (require 'ledger-config)
 ;; Not working

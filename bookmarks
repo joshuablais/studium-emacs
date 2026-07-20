@@ -2,7 +2,13 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("guix"
+(("renaissance"
+ (filename . "~/Development/renaissance/")
+ (front-context-string)
+ (rear-context-string . "92 Jul 16 20:31 ")
+ (position . 149)
+ (last-modified 27227 32772 570717 116000))
+("guix"
  (filename . "~/.config/guix/")
  (front-context-string . "current -> /var/")
  (rear-context-string . "47 May 25 07:24 ")
@@ -105,11 +111,11 @@
  (position . 104)
  (last-modified 27176 12226 380186 425000))
 ("org-capture-last-stored"
- (filename . "~/org/bookmarks.org")
- (front-context-string . "** [[https://gui")
- (rear-context-string . "TAGS: zig\n:END:\n")
- (position . 22452)
- (last-modified 27188 6665 455176 960000))
+ (filename . "~/org/notes.org")
+ (front-context-string . "** [2026-07-20 M")
+ (rear-context-string . " Notes\n\n* Inbox\n")
+ (position . 25)
+ (last-modified 27230 16880 271917 678000))
 ("calendar.org"
  (filename . "~/org/calendar.org")
  (front-context-string . "e\n:PROPERTIES:\n:")
