@@ -3,7 +3,7 @@
 ;; Username setup
 (setq user-full-name "Joshua Blais"
       user-mail-address "josh@joshblais.com")
-(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo")
+(setq auth-sources '("~/.authinfo.gpg")
       auth-source-cache-expiry nil)
 
 ;; Elpaca bootstrap

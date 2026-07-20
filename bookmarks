@@ -33,12 +33,6 @@
  (rear-context-string . "42 Feb  5 12:16 ")
  (position . 888)
  (last-modified 27138 15848 197788 588000))
-("KennyLaw"
- (filename . "~/Development/HWD Sites/KennyLaw/")
- (front-context-string)
- (rear-context-string . "0K May  7 14:08 ")
- (position . 835)
- (last-modified 27138 14763 900276 584000))
 ("Library"
  (filename . "~/Library/")
  (front-context-string . "Abelson\n  drwxr-")
@@ -111,11 +105,25 @@
  (position . 104)
  (last-modified 27176 12226 380186 425000))
 ("org-capture-last-stored"
+<<<<<<< Updated upstream
  (filename . "~/org/notes.org")
  (front-context-string . "** [2026-07-20 M")
  (rear-context-string . " Notes\n\n* Inbox\n")
  (position . 25)
  (last-modified 27230 16880 271917 678000))
+||||||| Stash base
+ (filename . "~/org/calendar.org")
+ (front-context-string . "** Call RE: Site")
+ (rear-context-string . "2d2e59ec3\n:END:\n")
+ (position . 220)
+ (last-modified 27211 53016 131532 14000))
+=======
+ (filename . "~/org/inbox.org")
+ (front-context-string . "** TODO Fix emai")
+ (rear-context-string . "CAPTURED:\n:END:\n")
+ (position . 946)
+ (last-modified 27218 63656 230957 857000))
+>>>>>>> Stashed changes
 ("calendar.org"
  (filename . "~/org/calendar.org")
  (front-context-string . "e\n:PROPERTIES:\n:")
@@ -171,11 +179,11 @@
  (position . 79)
  (last-modified 27080 34324 907791 60000))
 ("writing"
- (filename . "~/Projects/writing/")
+ (filename . "~/Documents/writing/")
  (front-context-string . "Archived\n  drwxr")
- (rear-context-string . "0K Jan 18 14:01 ")
- (position . 75)
- (last-modified 27080 34321 147993 822000))
+ (rear-context-string . "96 Jun 28 13:06 ")
+ (position . 83)
+ (last-modified 27201 28875 640043 204000))
 ("nixos-config"
  (filename . "~/nixos-config/")
  (front-context-string . "dotfiles\n  drwxr")
