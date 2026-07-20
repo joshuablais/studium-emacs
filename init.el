@@ -224,7 +224,7 @@
 ;; Not working
 ;; (require 'filechooser-config)
 (require 'grammars)
-(require 'guix-config)
+(require 'jb-guix)
 (require 'modeline)
 (require 'editing)
 (require 'tabs)
