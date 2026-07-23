@@ -68,5 +68,15 @@
   (interactive)
   (shell-command "~/.config/scripts/Misc/checks"))
 
+(defun jb/sort-block ()
+  "Sort lines of the innermost enclosing brace/paren block."
+  (interactive)
+  (save-excursion
+    (let* ((ppss (syntax-ppss))
+           (open (or (nth 1 ppss) (user-error "Not inside a block"))))
+      (goto-char open)
+      (let ((end (save-excursion (forward-sexp) (line-beginning-position))))
+        (forward-line 1)
+        (sort-lines nil (line-beginning-position) end)))))
 
 (provide 'tools)

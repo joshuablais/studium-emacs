@@ -33,6 +33,12 @@
  (rear-context-string . "42 Feb  5 12:16 ")
  (position . 888)
  (last-modified 27138 15848 197788 588000))
+("KennyLaw"
+ (filename . "~/Development/HWD Sites/kennylaw/")
+ (front-context-string . "components\n  drw")
+ (rear-context-string . "96 Jun 30 13:39 ")
+ (position . 154)
+ (last-modified 27233 11312 20727 345000))
 ("Library"
  (filename . "~/Library/")
  (front-context-string . "Abelson\n  drwxr-")
@@ -100,30 +106,16 @@
  (last-modified 27088 32023 547415 984000))
 ("org-refile-last-stored"
  (filename . "~/org/done.org")
- (front-context-string . "** Tire changeov")
- (rear-context-string . "6-06-09 Tuesday\n")
- (position . 104)
- (last-modified 27176 12226 380186 425000))
+ (front-context-string . "** DONE Eye doct")
+ (rear-context-string . "ruined]]\n:END:\n\n")
+ (position . 341)
+ (last-modified 27231 49136 165516 257000))
 ("org-capture-last-stored"
-<<<<<<< Updated upstream
- (filename . "~/org/notes.org")
- (front-context-string . "** [2026-07-20 M")
- (rear-context-string . " Notes\n\n* Inbox\n")
- (position . 25)
- (last-modified 27230 16880 271917 678000))
-||||||| Stash base
- (filename . "~/org/calendar.org")
- (front-context-string . "** Call RE: Site")
- (rear-context-string . "2d2e59ec3\n:END:\n")
- (position . 220)
- (last-modified 27211 53016 131532 14000))
-=======
- (filename . "~/org/inbox.org")
- (front-context-string . "** TODO Fix emai")
- (rear-context-string . "CAPTURED:\n:END:\n")
- (position . 946)
- (last-modified 27218 63656 230957 857000))
->>>>>>> Stashed changes
+ (filename . "~/org/roam/daily/2026-07-21.org")
+ (front-context-string . "* 12:54: Journal")
+ (rear-context-string . "letags: :daily:\n")
+ (position . 116)
+ (last-modified 27231 49443 499256 221000))
 ("calendar.org"
  (filename . "~/org/calendar.org")
  (front-context-string . "e\n:PROPERTIES:\n:")
@@ -179,11 +171,11 @@
  (position . 79)
  (last-modified 27080 34324 907791 60000))
 ("writing"
- (filename . "~/Documents/writing/")
+ (filename . "~/Projects/writing/")
  (front-context-string . "Archived\n  drwxr")
- (rear-context-string . "96 Jun 28 13:06 ")
- (position . 83)
- (last-modified 27201 28875 640043 204000))
+ (rear-context-string . "0K Jan 18 14:01 ")
+ (position . 75)
+ (last-modified 27080 34321 147993 822000))
 ("nixos-config"
  (filename . "~/nixos-config/")
  (front-context-string . "dotfiles\n  drwxr")
