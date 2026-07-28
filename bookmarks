@@ -130,11 +130,11 @@
  (position . 341)
  (last-modified 27231 49136 165516 257000))
 ("org-capture-last-stored"
- (filename . "~/org/roam/daily/2026-07-21.org")
- (front-context-string . "* 12:54: Journal")
- (rear-context-string . "letags: :daily:\n")
- (position . 116)
- (last-modified 27231 49443 499256 221000))
+ (filename . "~/org/inbox.org")
+ (front-context-string . "** TODO List acc")
+ (rear-context-string . "e email on guix\n")
+ (position . 1217)
+ (last-modified 27240 6815 143742 841000))
 ("calendar.org"
  (filename . "~/org/calendar.org")
  (front-context-string . "e\n:PROPERTIES:\n:")
