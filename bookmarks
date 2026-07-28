@@ -2,7 +2,13 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("renaissance"
+(("writing"
+ (filename . "~/Projects/writing/")
+ (front-context-string . "Posted\n  drwxr-x")
+ (rear-context-string . "88 Jul  7 13:03 ")
+ (position . 368)
+ (last-modified 27232 64846 679203 925000))
+("renaissance"
  (filename . "~/Development/renaissance/")
  (front-context-string)
  (rear-context-string . "92 Jul 16 20:31 ")
@@ -29,6 +35,7 @@
  (last-modified 27148 37205 654287 621000))
 ("scripts"
  (filename . "~/.config/scripts/")
+<<<<<<< Updated upstream
  (front-context-string . "resolve.sh\n  -rw")
  (rear-context-string . "42 Feb  5 12:16 ")
  (position . 888)
@@ -39,6 +46,17 @@
  (rear-context-string . "96 Jun 30 13:39 ")
  (position . 154)
  (last-modified 27233 11312 20727 345000))
+||||||| Stash base
+ (front-context-string . "resolve.sh\n  -rw")
+ (rear-context-string . "42 Feb  5 12:16 ")
+ (position . 888)
+ (last-modified 27138 15848 197788 588000))
+=======
+ (front-context-string . "Accounting\n  drw")
+ (rear-context-string . "96 Jul 22 13:37 ")
+ (position . 81)
+ (last-modified 27233 7366 729091 242000))
+>>>>>>> Stashed changes
 ("Library"
  (filename . "~/Library/")
  (front-context-string . "Abelson\n  drwxr-")
@@ -106,6 +124,7 @@
  (last-modified 27088 32023 547415 984000))
 ("org-refile-last-stored"
  (filename . "~/org/done.org")
+<<<<<<< Updated upstream
  (front-context-string . "** DONE Eye doct")
  (rear-context-string . "ruined]]\n:END:\n\n")
  (position . 341)
@@ -182,4 +201,112 @@
  (rear-context-string . "0K Mar 28 11:49 ")
  (position . 119)
  (last-modified 27080 14032 292472 364000))
+||||||| Stash base
+ (front-context-string . "** Tire changeov")
+ (rear-context-string . "6-06-09 Tuesday\n")
+ (position . 104)
+ (last-modified 27176 12226 380186 425000))
+("org-capture-last-stored"
+<<<<<<< Updated upstream
+ (filename . "~/org/notes.org")
+ (front-context-string . "** [2026-07-20 M")
+ (rear-context-string . " Notes\n\n* Inbox\n")
+ (position . 25)
+ (last-modified 27230 16880 271917 678000))
+||||||| Stash base
+ (filename . "~/org/calendar.org")
+ (front-context-string . "** Call RE: Site")
+ (rear-context-string . "2d2e59ec3\n:END:\n")
+ (position . 220)
+ (last-modified 27211 53016 131532 14000))
+=======
+ (filename . "~/org/inbox.org")
+ (front-context-string . "** TODO Fix emai")
+ (rear-context-string . "CAPTURED:\n:END:\n")
+ (position . 946)
+ (last-modified 27218 63656 230957 857000))
+>>>>>>> Stashed changes
+("calendar.org"
+ (filename . "~/org/calendar.org")
+ (front-context-string . "e\n:PROPERTIES:\n:")
+ (rear-context-string . " 101 9519 160 av")
+ (position . 111)
+ (last-modified 27080 34406 33769 121000))
+("roam"
+ (filename . "~/org/roam/")
+ (front-context-string . "accounting\n  drw")
+ (rear-context-string . "0K Jul 28  2025 ")
+ (position . 67)
+ (last-modified 27080 34400 463281 860000))
+("org"
+ (filename . "~/org/")
+ (front-context-string . "inbox.org\n  -rw-")
+ (rear-context-string . "6K Mar 28 15:28 ")
+ (position . 481)
+ (last-modified 27080 34397 152290 337000))
+("inbox.org"
+ (filename . "~/org/inbox.org")
+ (front-context-string . "#+title: Inbox\n\n")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27128 42938 949897 724000))
+("joshuablais.com"
+ (filename . "~/Development/joshuablais.com/")
+ (front-context-string . "dist\n  drwxr-xr-")
+ (rear-context-string . "0K Aug  8  2025 ")
+ (position . 86)
+ (last-modified 27080 34381 991446 33000))
+("revereimaginative"
+ (filename . "~/Development/revereimaginative/")
+ (front-context-string . "cmd\n  drwxr-xr-x")
+ (rear-context-string . "0K Mar  7 11:26 ")
+ (position . 88)
+ (last-modified 27080 34362 943433 229000))
+("Development"
+ (filename . "~/Development/")
+ (front-context-string . "acetheosce\n  drw")
+ (rear-context-string . "0K Jan 12 20:00 ")
+ (position . 70)
+ (last-modified 27080 34351 260447 990000))
+("2026 Revere Ledger"
+ (filename . "~/Accounting/Revere/2026/Ledger/transactions.ledger")
+ (front-context-string . ";===============")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27080 34335 201763 47000))
+("Ace the OSCE"
+ (filename . "~/Projects/Ace the OSCE/")
+ (front-context-string . "Exams\n  drwxr-xr")
+ (rear-context-string . "0K Feb 24 20:23 ")
+ (position . 79)
+ (last-modified 27080 34324 907791 60000))
+("writing"
+ (filename . "~/Documents/writing/")
+ (front-context-string . "Archived\n  drwxr")
+ (rear-context-string . "96 Jun 28 13:06 ")
+ (position . 83)
+ (last-modified 27201 28875 640043 204000))
+("nixos-config"
+ (filename . "~/nixos-config/")
+ (front-context-string . "dotfiles\n  drwxr")
+ (rear-context-string . "0K Mar 28 11:49 ")
+ (position . 119)
+ (last-modified 27080 14032 292472 364000))
+=======
+ (front-context-string . "** Tire changeov")
+ (rear-context-string . "6-06-09 Tuesday\n")
+ (position . 104)
+ (last-modified 27176 12226 380186 425000))
+("org-capture-last-stored" <<<<<<< Updated upstream
+ (filename . "~/org/notes.org")
+ (front-context-string . "** [2026-07-20 M")
+ (rear-context-string . " Notes\n\n* Inbox\n")
+ (position . 25)
+ (last-modified 27230 16880 271917 678000))
+|||||||Stashbase(filename . "~/org/calendar.org")
+(front-context-string . "** Call RE: Site")
+(rear-context-string . "2d2e59ec3\n:END:\n")
+(position . 220)
+(last-modified 27211 53016 131532 14000)
+>>>>>>> Stashed changes
 )
