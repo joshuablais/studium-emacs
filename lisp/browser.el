@@ -34,8 +34,13 @@
   :ensure t)
 
 (defun jb/browse-url-chromium (url &rest _args)
-  "Open URL in chromium."
-  (start-process "chromium" nil "chromium" url))
+  "Open URL in chromium and focus the chromium window under Sway."
+  (start-process "chromium" nil "chromium" url)
+  (run-with-timer
+   0.1 nil
+   (lambda ()
+     (call-process "swaymsg" nil nil nil
+                   "[app_id=\"chromium\"] focus"))))
 
 (defun my-browse-url-mpv (url &rest _args)
   "Open URL in mpv."
@@ -50,11 +55,15 @@
 
 (defvar jb/chromium-domains
   '("github.com" "gitlab.com" "codeberg.org" "forge.labrynth.org"
-    "google.com" "annas-archive.gl")
+    "google.com" "annas-archive.gl" "search.nixos.org" "toys.whereis.social"
+    "goodreads.com" "youtube.com" "reddit.com" "kagi.com"
+    "perplexity.ai" "wolframalpha.com" "sourcegraph.com"
+    "archive.org" "yandex.com")
   "Domains forced to open in chromium rather than eww.")
 
 (setq browse-url-handlers
-      `(("\\(youtube\\.com\\|youtu\\.be\\|vimeo\\.com\\|twitch\\.tv\\)" . my-browse-url-mpv)
+      `(
+        ;; ("\\(youtube\\.com\\|youtu\\.be\\|vimeo\\.com\\|twitch\\.tv\\)" . my-browse-url-mpv)
         ("\\.mp4$" . my-browse-url-mpv)
         ("\\.pdf$" . my-browse-url-pdf)
         ("^gemini://" . elpher-browse-url-elpher)
