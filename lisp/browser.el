@@ -71,9 +71,7 @@
         (,(regexp-opt jb/chromium-domains) . jb/browse-url-chromium)
         ("." . eww-browse-url)))
 
-;; Keep your fallback setting
-(setq browse-url-secondary-browser-function 'browse-url-generic
-      browse-url-generic-program "chromium")
+(setq browse-url-secondary-browser-function #'jb/browse-url-chromium)
 
 (with-eval-after-load 'eww
   (define-key eww-mode-map (kbd "=") #'text-scale-increase)
