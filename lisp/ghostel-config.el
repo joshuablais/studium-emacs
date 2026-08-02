@@ -23,4 +23,17 @@
         (window-height . 0.3)
         (window-parameters . ((no-delete-other-windows . t))))))))
 
+;; Explicitly spawn a new frame with ghostel
+(defun my/new-frame-with-ghostel ()
+  "Create a new frame and immediately open ghostel in it."
+  (interactive)
+  (require 'ghostel)
+  (let ((new-frame (make-frame '((explicit-ghostel . t)))))
+    (select-frame new-frame)
+    (delete-other-windows)
+    (let ((ghostel-buffer (ghostel (format "*ghostel-%s*" (frame-parameter new-frame 'name)))))
+      (switch-to-buffer ghostel-buffer)
+      (delete-other-windows))))
+
+
 (provide 'ghostel-config)
