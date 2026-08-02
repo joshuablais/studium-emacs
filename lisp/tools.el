@@ -75,4 +75,15 @@
   (ignore-errors
     (password-store-get entry)))
 
+(defun jb/just (recipe)
+  "Run a just RECIPE from the project root through `compile'."
+  (interactive
+   (list (completing-read
+          "just: "
+          (let ((default-directory (project-root (project-current t))))
+            (split-string
+             (shell-command-to-string "just --summary 2>/dev/null") nil t)))))
+  (let ((default-directory (project-root (project-current t))))
+    (compile (format "just %s" recipe))))
+
 (provide 'tools)
