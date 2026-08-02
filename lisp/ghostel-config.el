@@ -35,5 +35,10 @@
       (switch-to-buffer ghostel-buffer)
       (delete-other-windows))))
 
+(define-key ghostel-mode-map (kbd "C-<left>")  #'windmove-left)
+(define-key ghostel-mode-map (kbd "C-<right>") #'windmove-right)
+(define-key ghostel-mode-map (kbd "C-<up>")    #'windmove-up)
+(define-key ghostel-mode-map (kbd "C-<down>")  #'windmove-down)
+
 
 (provide 'ghostel-config)
