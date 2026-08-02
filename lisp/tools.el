@@ -76,18 +76,18 @@
     (password-store-get entry)))
 
 (defun jb/just (recipe)
-  "Run a just RECIPE from the project root through `compile'."
+  "Run a just RECIPE from the project root, using the project's direnv env."
   (interactive
-   (let* ((root (project-root (project-current t)))
-          (default-directory root)
-          (recipes (ignore-errors
-                     (process-lines "just" "--summary"))))
-     ;; --summary returns one space-separated line; split it.
-     (setq recipes (and recipes
-                        (split-string (car recipes) "[ \n]+" t)))
-     (unless recipes
-       (user-error "No just recipes found in %s" root))
-     (list (completing-read "just: " recipes nil t))))
+   (let* ((proj (project-current t))
+          (root (project-root proj))
+          (default-directory root))
+     ;; Force the project's direnv environment even if called from
+     ;; a non-project buffer (scratch, minibuffer, etc.).
+     (envrc--update-env root)
+     (let ((recipes (ignore-errors (process-lines "just" "--summary"))))
+       (setq recipes (and recipes (split-string (car recipes) "[ \n]+" t)))
+       (unless recipes (user-error "No just recipes found in %s" root))
+       (list (completing-read "just: " recipes nil t)))))
   (let ((default-directory (project-root (project-current t))))
     (compile (format "just %s" recipe))))
 
