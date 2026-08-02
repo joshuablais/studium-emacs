@@ -1,12 +1,7 @@
 ;;; ghostel-config.el --- Description -*- lexical-binding: t; -*-
 
 (use-package ghostel
-  :ensure t
-  :bind (:map ghostel-mode-map
-              ("C-<left>"  . windmove-left)
-              ("C-<right>" . windmove-right)
-              ("C-<up>"    . windmove-up)
-              ("C-<down>"  . windmove-down)))
+  :ensure t)
 
 (defun jb/ghostel ()
   "Open ghostel buffer as a bottom popup at 30% height."
@@ -39,5 +34,12 @@
     (let ((ghostel-buffer (ghostel (format "*ghostel-%s*" (frame-parameter new-frame 'name)))))
       (switch-to-buffer ghostel-buffer)
       (delete-other-windows))))
+
+(with-eval-after-load 'ghostel
+  (dolist (map (list ghostel-char-mode-map ghostel-semi-char-mode-map))
+    (define-key map (kbd "C-<left>")  #'windmove-left)
+    (define-key map (kbd "C-<right>") #'windmove-right)
+    (define-key map (kbd "C-<up>")    #'windmove-up)
+    (define-key map (kbd "C-<down>")  #'windmove-down)))
 
 (provide 'ghostel-config)
