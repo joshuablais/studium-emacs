@@ -75,20 +75,85 @@
   (ignore-errors
     (password-store-get entry)))
 
-(defun jb/just (recipe)
-  "Run a just RECIPE from the project root, using the project's direnv env."
+(defgroup jb/just nil
+  "Custom integration for `just` runner."
+  :group 'tools)
+
+(defvar jb/just-last-root nil
+  "Last project root used by `jb/just`.")
+
+(defvar jb/just-last-recipe nil
+  "Last recipe executed by `jb/just`.")
+
+(defun jb/just--find-root (&optional arg)
+  "Determine the project root directory.
+If ARG is non-nil, force prompting for a project root via `project-prompt-project-dir`."
+  (cond
+   (arg (project-root (project-current t)))
+   ((project-current) (project-root (project-current)))
+   (jb/just-last-root jb/just-last-root)
+   (t (project-root (project-current t)))))
+
+(defun jb/just--executable (root)
+  "Locate the `just` binary, preferring project-local direnv environments."
+  (let ((local-just (expand-file-name ".direnv/profile/bin/just" root)))
+    (if (file-executable-p local-just)
+        local-just
+      (or (executable-find "just")
+          (error "Could not find `just` executable")))))
+
+(defun jb/just--get-recipes (root)
+  "Extract available recipes using `just --summary`."
+  (let ((default-directory root)
+        (just (jb/just--executable root)))
+    (when (fboundp 'envrc--update-env)
+      (ignore-errors (envrc--update-env root)))
+    (with-temp-buffer
+      (if (zerop (call-process just nil t nil "--summary"))
+          (split-string (buffer-string) "[ \t\n]+" t)
+        (error "Failed to retrieve recipes from %s" root)))))
+
+;;;###autoload
+(defun jb/just (root recipe &optional arg)
+  "Run a just RECIPE from project ROOT using compilation mode.
+
+With a single prefix argument (\\[universal-argument]), prompt to choose a
+different project ROOT.
+With a double prefix argument (\\[universal-argument] \\[universal-argument]),
+re-run the last executed recipe directly."
   (interactive
-   (let* ((proj (project-current t))
-          (root (project-root proj))
-          (default-directory root))
-     ;; Force the project's direnv environment even if called from
-     ;; a non-project buffer (scratch, minibuffer, etc.).
-     (envrc--update-env root)
-     (let ((recipes (ignore-errors (process-lines "just" "--summary"))))
-       (setq recipes (and recipes (split-string (car recipes) "[ \n]+" t)))
-       (unless recipes (user-error "No just recipes found in %s" root))
-       (list (completing-read "just: " recipes nil t)))))
-  (let ((default-directory (project-root (project-current t))))
-    (compile (format "just %s" recipe))))
+   (let* ((force-root (equal current-prefix-arg '(4)))
+          (rerun (equal current-prefix-arg '(16)))
+          (root (if rerun
+                    (or jb/just-last-root (jb/just--find-root))
+                  (jb/just--find-root force-root)))
+          (recipes (unless rerun (jb/just--get-recipes root)))
+          (recipe (if rerun
+                      (or jb/just-last-recipe
+                          (completing-read "just: " recipes nil t))
+                    (completing-read (format "just (%s): "
+                                             (file-name-nondirectory
+                                              (directory-file-name root)))
+                                     recipes nil t))))
+     (list root recipe current-prefix-arg)))
+
+  (setq jb/just-last-root root
+        jb/just-last-recipe recipe)
+
+  (let* ((default-directory root)
+         (just (jb/just--executable root))
+         (profile-bin (expand-file-name ".direnv/profile/bin" root))
+         (compilation-environment
+          (append (list (concat "PATH=" profile-bin ":" (getenv "PATH")))
+                  compilation-environment)))
+    (compile (format "%s %s" just recipe))))
+
+;;;###autoload
+(defun jb/just-rerun ()
+  "Re-run the last `jb/just` recipe in its respective project root."
+  (interactive)
+  (if (and jb/just-last-root jb/just-last-recipe)
+      (jb/just jb/just-last-root jb/just-last-recipe)
+    (call-interactively #'jb/just)))
 
 (provide 'tools)
