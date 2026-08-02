@@ -6,9 +6,6 @@
 (setq auth-sources '("~/.authinfo.gpg")
       auth-source-cache-expiry nil)
 
-;; dir-locals fix
-(put 'compilation-read-command 'safe-local-variable #'booleanp)
-
 ;; Elpaca bootstrap
 (defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
