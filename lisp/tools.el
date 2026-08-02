@@ -80,10 +80,13 @@
   (interactive
    (let* ((root (project-root (project-current t)))
           (default-directory root)
-          (output (shell-command-to-string "just --summary 2>/dev/null"))
-          (recipes (split-string output "[ \n]+" t)))
+          (recipes (ignore-errors
+                     (process-lines "just" "--summary"))))
+     ;; --summary returns one space-separated line; split it.
+     (setq recipes (and recipes
+                        (split-string (car recipes) "[ \n]+" t)))
      (unless recipes
-       (user-error "No just recipes found in %s (justfile present?)" root))
+       (user-error "No just recipes found in %s" root))
      (list (completing-read "just: " recipes nil t))))
   (let ((default-directory (project-root (project-current t))))
     (compile (format "just %s" recipe))))
