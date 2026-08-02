@@ -56,7 +56,7 @@
    ;; Miscellaneous
    '("!" . jb/run-command)
    '("o t" . jb/ghostel)
-   '("o T" . vterm)
+   '("o T" . ghostel)
    '("o C" . jb/checks)
    '("o D" . jb/download-media)
    '("s T" . powerthesaurus-lookup-synonyms-dwim)
@@ -232,6 +232,7 @@
           (elfeed-show-mode . motion)
           (erc-mode . insert)
           (vterm-mode . insert)
+          (ghostel-mode . insert)
           (pdf-view-mode . motion)
           (calibredb-search-mode . motion)
           (dirvish-mode . motion)
