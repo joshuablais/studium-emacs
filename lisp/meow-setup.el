@@ -55,7 +55,7 @@
 
    ;; Miscellaneous
    '("!" . jb/run-command)
-   '("o t" . jb/vterm)
+   '("o t" . jb/ghostel)
    '("o T" . vterm)
    '("o C" . jb/checks)
    '("o D" . jb/download-media)
