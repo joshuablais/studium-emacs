@@ -58,7 +58,7 @@
     "google.com" "annas-archive.gl" "search.nixos.org" "toys.whereis.social"
     "goodreads.com" "youtube.com" "reddit.com" "kagi.com"
     "perplexity.ai" "wolframalpha.com" "sourcegraph.com"
-    "archive.org" "yandex.com")
+    "archive.org" "yandex.com" "searx.labrynth.org" "127.0.0.1:4433")
   "Domains forced to open in chromium rather than eww.")
 
 (setq browse-url-handlers
