@@ -1,0 +1,6 @@
+# name: test-expect
+# key: te
+# --
+test "$1" {
+    try std.testing.expectEqual($2, $3);$0
+}

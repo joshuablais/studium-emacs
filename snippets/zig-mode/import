@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: import
+# key: im
+# --
+const ${1:$(replace-regexp-in-string "\\..*" "" (replace-regexp-in-string ".*/" "" yas-text))} = @import("$1");$0
