@@ -1,3 +1,4 @@
+;;; universal-launcher.el --- one-line description  -*- lexical-binding: t; -*-
 ;;; universal-launcher.el --- Optimized universal launcher
 
 ;;; Commentary:
@@ -240,7 +241,7 @@
              (section-items '()))
 
         (dolist (type types)
-          (when-let ((handler (gethash type category-handlers)))
+          (when-let* ((handler (gethash type category-handlers)))
             (setq section-items (append section-items (funcall handler)))))
 
         (when section-items
@@ -712,7 +713,7 @@ C-u prefix forces engine re-selection."
 (defun universal-launcher--frecency-score (item-text)
   "Calculate frecency score for ITEM-TEXT.
 Combines frequency (usage count) with recency (time decay)."
-  (if-let ((data (alist-get item-text universal-launcher--launch-history nil nil #'equal)))
+  (if-let* ((data (alist-get item-text universal-launcher--launch-history nil nil #'equal)))
       (let* ((count (car data))
              (last-time (cdr data))
              (age-days (/ (- (float-time) last-time) 86400.0))

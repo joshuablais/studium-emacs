@@ -206,6 +206,17 @@
   (add-to-list 'recentf-exclude (recentf-expand-file-name no-littering-etc-directory))
   (add-hook 'kill-emacs-hook #'recentf-cleanup -90))
 
+;; Make sure direnv sees treesitter grammars
+(defun jb/treesit-ensure-direnv-path (&rest _)
+  (when-let* ((root (locate-dominating-file
+                     (or buffer-file-name default-directory) ".envrc"))
+              (dir (expand-file-name ".direnv/profile/lib/tree-sitter/"
+                                     (expand-file-name root))))   ; <- expand the tilde
+    (when (file-directory-p dir)
+      (add-to-list 'treesit-extra-load-path dir))))
+
+(advice-add 'treesit-ready-p :before #'jb/treesit-ensure-direnv-path)
+
 ;; Modules
 (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lisp/custom/" user-emacs-directory))

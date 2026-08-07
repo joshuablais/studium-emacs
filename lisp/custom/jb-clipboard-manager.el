@@ -1,3 +1,5 @@
+;;; jb-clipboard-manager.el --- one-line description  -*- lexical-binding: t; -*-
+
 (defun jb/get-cliphist-entries ()
   "Get the 50 most recent clipboard entries from cliphist, fully decoded."
   (when (executable-find "cliphist")

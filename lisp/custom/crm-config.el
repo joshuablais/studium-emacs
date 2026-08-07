@@ -1,4 +1,4 @@
-
+;;; crm-config.el --- one-line description  -*- lexical-binding: t; -*-
 ;; Kdeconnect-Cli setup
 (defvar kde-connect-id "cd355a901c564b2eabccdd7443fba295")
 

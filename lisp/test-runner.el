@@ -1,4 +1,4 @@
-;;; test-runner.el --- language-agnostic test/benchmark/run dispatch
+;;; test-runner.el --- one-line description  -*- lexical-binding: t; -*-
 (defvar my/test-runner-alist
   '((go-mode
      :run            "go run ./..."
@@ -98,7 +98,7 @@ Tokens: %f current file, %t test name at point, %d project root.")
     (when fn (funcall fn))))
 
 (defun my/test--project-root ()
-  (if-let ((proj (project-current)))
+  (if-let* ((proj (project-current)))
       (project-root proj)
     default-directory))
 

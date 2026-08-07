@@ -81,10 +81,10 @@
       (mu4e-compose-new)
       (message-goto-to)
       (insert to)
-      (when-let ((subject (cadr (assoc "subject" headers))))
+      (when-let* ((subject (cadr (assoc "subject" headers))))
         (message-goto-subject)
         (insert (url-unhex-string subject)))
-      (when-let ((body (cadr (assoc "body" headers))))
+      (when-let* ((body (cadr (assoc "body" headers))))
         (message-goto-body)
         (insert (url-unhex-string body)))))
 

@@ -71,4 +71,6 @@
 ;;; Native comp
 (setq native-comp-async-report-warnings-errors 'silent)
 
+(setq elpaca-core-date '(20250601))
+
 (provide 'early-init)
