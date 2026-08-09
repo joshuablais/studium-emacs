@@ -49,7 +49,7 @@ Tokens: %f current file, %t test name at point, %d project root.")
     (go-ts-mode     . my/go-test-name-at-point)
     (rust-mode      . my/rust-test-name-at-point)
     (python-ts-mode . my/python-test-name-at-point)
-    (zig-ts-mode       . my/zig-test-name-at-point))
+    (zig-mode       . my/zig-test-name-at-point))
   "Alist of major-mode -> function returning test name at point.")
 
 (defun my/go-test-name-at-point ()
