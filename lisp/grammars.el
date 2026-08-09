@@ -34,6 +34,10 @@
                  ("\\.h\\'"      . c-ts-mode)))
   (add-to-list 'auto-mode-alist entry))
 
+(use-package zig-mode
+  :ensure t
+  :mode "\\.zig\\'")
+
 (use-package templ-ts-mode
   :mode "\\.templ\\'")
 
@@ -93,7 +97,7 @@
          (nix-ts-mode    . eglot-ensure)
          (templ-ts-mode  . eglot-ensure)
          (terraform-ts-mode . eglot-ensure)
-         (zig-ts-mode       . eglot-ensure))
+         (zig-mode       . eglot-ensure))
   :custom
   (eglot-autoshutdown       t)
   (eglot-events-buffer-size 0)

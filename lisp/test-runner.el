@@ -32,7 +32,7 @@
      :test-single    "cargo test %t -- --exact"
      :bench-all      "cargo bench"
      :bench-at-point "cargo bench %t")
-    (zig-ts-mode
+    (zig-mode
      :run            "zig build run"
      :test-all       "zig build test"
      :test-file      "zig test %f"
