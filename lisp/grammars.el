@@ -23,6 +23,7 @@
           (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
           (css        "https://github.com/tree-sitter/tree-sitter-css")
           (c          "https://github.com/tree-sitter/tree-sitter-c")
+          (just       "https://github.com/leon-barrett/just-ts-mode.el")
           (zig        "https://github.com/tree-sitter-grammars/tree-sitter-zig")
           (hcl        "https://github.com/tree-sitter-grammars/tree-sitter-hcl" "main" "src")
           (html       "https://github.com/tree-sitter/tree-sitter-html"))))
@@ -48,6 +49,10 @@
   :ensure t
   :mode ("\\.tf\\'" "\\.tfvars\\'")
   :hook (terraform-mode . eglot-ensure))
+
+(use-package just-ts-mode
+  :ensure t
+  :mode "[Jj]ustfile\\'")
 
 ;; YASNIPPET
 ;; No :defer — yas-global-mode must be live before the first eglot buffer
@@ -95,6 +100,7 @@
          (html-ts-mode   . eglot-ensure)
          (c-ts-mode      . eglot-ensure)
          (nix-ts-mode    . eglot-ensure)
+         (just-ts-mode    . eglot-ensure)
          (templ-ts-mode  . eglot-ensure)
          (terraform-ts-mode . eglot-ensure)
          (zig-mode       . eglot-ensure))
