@@ -1,30 +1,19 @@
 ;;; elpher-config.el --- Description -*- lexical-binding: t; -*-
 
 (use-package elpher
-  :ensure (:url "https://thelambdalab.xyz/git/elpher.git" :depth nil)
+  :ensure (:host github :repo "emacsmirror/elpher")
   :defer t
-  :config
-  (defun my/org-return-and-maybe-elpher ()
-    "Handle org-return and open gemini/gopher links in elpher when appropriate."
-    (interactive)
-    (let ((context (org-element-context)))
-      (if (and (eq (org-element-type context) 'link)
-               (member (org-element-property :type context) '("gemini" "gopher")))
-          (let ((url (org-element-property :raw-link context)))
-            (elpher-go url))
-        (org-return))))
-  (with-eval-after-load 'org
-    (define-key org-mode-map (kbd "RET") #'my/org-return-and-maybe-elpher)
-    (org-link-set-parameters "gemini"
-                             :follow (lambda (path)
-                                       (elpher-go (concat "gemini://" path))))
-    (org-link-set-parameters "gopher"
-                             :follow (lambda (path)
-                                       (elpher-go (concat "gopher://" path))))))
+  :bind (:map elpher-mode-map
+              ("b" . elpher-back)
+              ("a" . elpher-bookmark-link)))
 
-;; Keybinds
-(with-eval-after-load 'elpher
-  (define-key elpher-mode-map (kbd "b") #'elpher-back)
-  (define-key elpher-mode-map (kbd "a") #'elpher-bookmark-link))
+(with-eval-after-load 'org
+  (setq org-return-follows-link t)
+  (org-link-set-parameters
+   "gemini"
+   :follow (lambda (path _) (elpher-go (concat "gemini://" path))))
+  (org-link-set-parameters
+   "gopher"
+   :follow (lambda (path _) (elpher-go (concat "gopher://" path)))))
 
 (provide 'elpher-config)
