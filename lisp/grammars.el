@@ -101,6 +101,7 @@
          (c-ts-mode      . eglot-ensure)
          (nix-ts-mode    . eglot-ensure)
          (just-ts-mode    . eglot-ensure)
+         (scheme-mode    . eglot-ensure)
          (templ-ts-mode  . eglot-ensure)
          (terraform-ts-mode . eglot-ensure)
          (zig-mode       . eglot-ensure))
@@ -111,7 +112,9 @@
   (eglot-extend-to-xref     t)
   :config
   (add-to-list 'eglot-server-programs
-               '(templ-ts-mode . ("templ" "lsp"))))
+               '(templ-ts-mode . ("templ" "lsp")))
+  (add-to-list 'eglot-server-programs
+               '(scheme-mode . ("guile-lsp-server"))))
 
 (add-hook 'before-save-hook
           (lambda ()
