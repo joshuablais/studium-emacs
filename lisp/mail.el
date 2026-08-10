@@ -18,12 +18,12 @@
         mu4e-view-show-addresses t)
 
   (setq message-send-mail-function 'message-send-mail-with-sendmail
-        send-mail-function 'message-send-mail-with-sendmail
-        sendmail-program (executable-find "msmtp")
+        send-mail-function          'sendmail-send-it
+        sendmail-program            (executable-find "msmtp")
         message-sendmail-extra-arguments '("--read-envelope-from")
-        message-sendmail-f-is-evil t
-        mail-specify-envelope-from t
-        mail-envelope-from 'header)
+        message-sendmail-f-is-evil  t
+        mail-specify-envelope-from  t
+        mail-envelope-from          'header)
 
   (setq user-mail-address "josh@joshblais.com"
         user-full-name "Joshua Blais")
