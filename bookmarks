@@ -59,7 +59,6 @@
  (last-modified 27148 37205 654287 621000))
 ("scripts"
  (filename . "~/.config/scripts/")
- <<<<<<< Updated upstream
  (front-context-string . "resolve.sh\n  -rw")
  (rear-context-string . "42 Feb  5 12:16 ")
  (position . 888)
@@ -70,7 +69,7 @@
  (rear-context-string . "96 Jun 30 13:39 ")
  (position . 154)
  (last-modified 27233 11312 20727 345000))
-|||||||Stashbase(front-context-string . "resolve.sh\n  -rw")
+(front-context-string . "resolve.sh\n  -rw")
 (rear-context-string . "42 Feb  5 12:16 ")
 (position . 888)
 (last-modified 27138 15848 197788 588000)
