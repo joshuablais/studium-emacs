@@ -1,3 +1,4 @@
+;;; elfeed-download.el --- one-line description  -*- lexical-binding: t; -*-
 ;;; elfeed-download.el --- Download articles and videos from elfeed
 
 ;;; Commentary:
