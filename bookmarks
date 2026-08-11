@@ -69,8 +69,4 @@
  (rear-context-string . "96 Jun 30 13:39 ")
  (position . 154)
  (last-modified 27233 11312 20727 345000))
-(front-context-string . "resolve.sh\n  -rw")
-(rear-context-string . "42 Feb  5 12:16 ")
-(position . 888)
-(last-modified 27138 15848 197788 588000)
 )
