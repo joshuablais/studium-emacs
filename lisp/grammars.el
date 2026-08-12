@@ -28,6 +28,9 @@
           (hcl        "https://github.com/tree-sitter-grammars/tree-sitter-hcl" "main" "src")
           (html       "https://github.com/tree-sitter/tree-sitter-html"))))
 
+(setq treesit-extra-load-path
+      (list (expand-file-name "~/.guix-home/profile/lib/tree-sitter/")))
+
 (dolist (entry '(("\\.go\\'"     . go-ts-mode)
                  ("go\\.mod\\'"  . go-mod-ts-mode)
                  ("go\\.sum\\'"  . go-mod-ts-mode)
@@ -40,6 +43,7 @@
   :mode "\\.zig\\'")
 
 (use-package templ-ts-mode
+  :ensure (:host github :repo "brtholomy/templ-ts-mode")
   :mode "\\.templ\\'")
 
 (use-package nix-ts-mode
