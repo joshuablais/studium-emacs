@@ -2,12 +2,18 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("nixos-config"
-  (filename . "~/nixos-config/")
-  (front-context-string . "dotfiles\n  drwxr")
-  (rear-context-string . "96 Jun 21 14:34 ")
-  (position . 137)
-  (last-modified 27259 56250 648817 807000))
+(("revereimaginative"
+  (filename . "~/Development/revereimaginative/")
+  (front-context-string . "pages\n  drwxr-xr")
+  (rear-context-string . "96 Jul 28 14:18 ")
+  (position . 311)
+  (last-modified 27260 55788 107011 951000))
+("nixos-config"
+ (filename . "~/nixos-config/")
+ (front-context-string . "dotfiles\n  drwxr")
+ (rear-context-string . "96 Jun 21 14:34 ")
+ (position . 137)
+ (last-modified 27259 56250 648817 807000))
 ("org-capture-last-stored"
  (filename . "~/org/inbox.org")
  (front-context-string . "** TODO Get quot")
