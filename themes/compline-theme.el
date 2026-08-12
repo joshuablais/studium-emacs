@@ -10,11 +10,6 @@
 
 (require 'doom-themes)
 
-;;
-;;; Variables
-
-(require 'doom-themes)
-
 (defgroup doom-spacegrey-theme nil
   "Options for the `doom-spacegrey' theme."
   :group 'doom-themes)
@@ -81,7 +76,7 @@ determine the exact padding."
    (vertical-bar   (doom-darken bg 0.25))
    (selection      base4)
    (builtin        cyan)
-   (comments       base4) 
+   (comments       base4)
    (doc-comments   base4)
    (constants      base7)
    (functions      cyan)
@@ -162,6 +157,24 @@ determine the exact padding."
    ((org-quote &override) :background base1)
    (org-hide :foreground bg)
    ;;;; solaire-mode
+   ;;;; Override gnus
+   (gnus-group-news-low        :foreground base5)
+   (gnus-group-news-low-empty  :foreground base5)
+   (gnus-group-mail-low        :foreground base5)
+   (gnus-group-mail-low-empty  :foreground base5)
+   (gnus-group-news-1          :foreground blue)
+   (gnus-group-news-1-empty    :foreground blue)
+   (gnus-group-mail-1          :foreground green)
+   (gnus-group-mail-1-empty    :foreground green)
+   (gnus-group-news-2          :foreground green)
+   (gnus-group-news-2-empty    :foreground green)
+   (gnus-group-news-3          :foreground base6)
+   (gnus-group-news-3-empty    :foreground base6)
+   (gnus-group-mail-2          :foreground blue)
+   (gnus-group-mail-2-empty    :foreground blue)
+   (gnus-group-mail-3          :foreground base6)
+   (gnus-group-mail-3-empty    :foreground base6)
+
    (solaire-mode-line-face
     :inherit 'mode-line
     :background modeline-bg-l
