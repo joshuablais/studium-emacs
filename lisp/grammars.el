@@ -28,8 +28,10 @@
           (hcl        "https://github.com/tree-sitter-grammars/tree-sitter-hcl" "main" "src")
           (html       "https://github.com/tree-sitter/tree-sitter-html"))))
 
-(setq treesit-extra-load-path
-      (list (expand-file-name "~/.guix-home/profile/lib/tree-sitter/")))
+(dolist (dir (list (expand-file-name "~/.guix-home/profile/lib/tree-sitter/")
+                   (expand-file-name "~/.local/share/emacs/treesit/")))
+  (when (file-directory-p dir)
+    (add-to-list 'treesit-extra-load-path dir)))
 
 (dolist (entry '(("\\.go\\'"     . go-ts-mode)
                  ("go\\.mod\\'"  . go-mod-ts-mode)
