@@ -56,7 +56,7 @@
    ;; Miscellaneous
    '("!" . jb/run-command)
    '("o t" . jb/ghostel)
-   '("o T" . ghostel)
+   '("o T" . jb/ghostel-here)
    '("o C" . jb/checks)
    '("o D" . jb/download-media)
    '("s T" . powerthesaurus-lookup-synonyms-dwim)

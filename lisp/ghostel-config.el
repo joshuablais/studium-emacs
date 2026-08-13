@@ -42,4 +42,25 @@
     (define-key map (kbd "C-<up>")    #'windmove-up)
     (define-key map (kbd "C-<down>")  #'windmove-down)))
 
+(defun jb/ghostel-here ()
+  "Open a new ghostel buffer rooted at the current buffer's directory,
+in the current window."
+  (interactive)
+  (require 'ghostel)
+  (let* ((buf (window-buffer (selected-window)))
+         (dir (with-current-buffer buf
+                (cond
+                 ((buffer-file-name buf)
+                  (file-name-directory (buffer-file-name buf)))
+                 ((eq major-mode 'dired-mode)
+                  (dired-current-directory))
+                 (t default-directory))))
+         (default-directory dir)
+         (name (format "*ghostel-%s*" (abbreviate-file-name dir)))
+         (buf (or (get-buffer name)
+                  (save-window-excursion
+                    (ghostel name)
+                    (get-buffer name)))))
+    (switch-to-buffer buf)))
+
 (provide 'ghostel-config)
