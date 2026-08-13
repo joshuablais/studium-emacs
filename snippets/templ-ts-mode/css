@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: css
+# key: css
+# --
+css ${1}() {
+    ${2}
+}
