@@ -55,7 +55,20 @@
                   (mu4e-sent-folder   . "/RevereJosh/Sent")
                   (mu4e-drafts-folder . "/RevereJosh/Drafts")
                   (mu4e-trash-folder  . "/RevereJosh/Trash")
-                  (mu4e-refile-folder . "/RevereJosh/Archive")))))
+                  (mu4e-refile-folder . "/RevereJosh/Archive")))
+
+         (make-mu4e-context
+          :name "RIJoshua"
+          :match-func (lambda (msg)
+                        (when msg
+                          (string-prefix-p "/RIJoshua"
+                                           (mu4e-message-field msg :maildir))))
+          :vars '((user-mail-address  . "joshua@revereimaginative.com")
+                  (user-full-name     . "Joshua Blais")
+                  (mu4e-sent-folder   . "/RIJoshua/Sent")
+                  (mu4e-drafts-folder . "/RIJoshua/Drafts")
+                  (mu4e-trash-folder  . "/RIJoshua/Trash")
+                  (mu4e-refile-folder . "/RIJoshua/Archive")))))
 
   (setq mu4e-context-policy 'pick-first
         mu4e-compose-context-policy 'ask)

@@ -2,12 +2,24 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("revereimaginative"
-  (filename . "~/Development/revereimaginative/")
-  (front-context-string . "pages\n  drwxr-xr")
-  (rear-context-string . "96 Jul 28 14:18 ")
-  (position . 311)
-  (last-modified 27260 55788 107011 951000))
+(("Media"
+  (filename . "~/Development/Media/")
+  (front-context-string . "SacroSanctum\n  d")
+  (rear-context-string . "96 Aug 12 16:36 ")
+  (position . 610)
+  (last-modified 27262 2423 201519 696000))
+("org-refile-last-stored"
+ (filename . "~/org/done.org")
+ (front-context-string . "** DONE Update S")
+ (rear-context-string . "-08-13 Thursday\n")
+ (position . 105)
+ (last-modified 27262 1768 466095 836000))
+("revereimaginative"
+ (filename . "~/Development/revereimaginative/")
+ (front-context-string . "pages\n  drwxr-xr")
+ (rear-context-string . "96 Jul 28 14:18 ")
+ (position . 311)
+ (last-modified 27260 55788 107011 951000))
 ("nixos-config"
  (filename . "~/nixos-config/")
  (front-context-string . "dotfiles\n  drwxr")
@@ -15,11 +27,11 @@
  (position . 137)
  (last-modified 27259 56250 648817 807000))
 ("org-capture-last-stored"
- (filename . "~/org/inbox.org")
- (front-context-string . "** TODO Get quot")
- (rear-context-string . " tangling files\n")
- (position . 1525)
- (last-modified 27254 25649 249944 105000))
+ (filename . "~/org/roam/daily/2026-08-12.org")
+ (front-context-string . "* 20:05: Git not")
+ (rear-context-string . "oyment\n* 20:04:\n")
+ (position . 602)
+ (last-modified 27261 9994 603930 64000))
 ("org"
  (filename . "~/org/")
  (front-context-string . "inbox.org\n  -rw-")
