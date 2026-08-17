@@ -58,6 +58,19 @@
                   (mu4e-refile-folder . "/RevereJosh/Archive")))
 
          (make-mu4e-context
+          :name "HWDJoshua"
+          :match-func (lambda (msg)
+                        (when msg
+                          (string-prefix-p "/HWDJoshua"
+                                           (mu4e-message-field msg :maildir))))
+          :vars '((user-mail-address  . "joshua@holdsworthdesign.com")
+                  (user-full-name     . "Joshua Blais")
+                  (mu4e-sent-folder   . "/HWDJoshua/Sent")
+                  (mu4e-drafts-folder . "/HWDJoshua/Drafts")
+                  (mu4e-trash-folder  . "/HWDJoshua/Trash")
+                  (mu4e-refile-folder . "/HWDJoshua/Archive")))
+
+         (make-mu4e-context
           :name "RIJoshua"
           :match-func (lambda (msg)
                         (when msg

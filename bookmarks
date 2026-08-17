@@ -27,11 +27,11 @@
  (position . 137)
  (last-modified 27259 56250 648817 807000))
 ("org-capture-last-stored"
- (filename . "~/org/roam/daily/2026-08-12.org")
- (front-context-string . "* 20:05: Git not")
- (rear-context-string . "oyment\n* 20:04:\n")
- (position . 602)
- (last-modified 27261 9994 603930 64000))
+ (filename . "~/org/bookmarks.org")
+ (front-context-string . "** [[https://ugu")
+ (rear-context-string . "velopment\n:END:\n")
+ (position . 23692)
+ (last-modified 27263 28414 283863 594000))
 ("org"
  (filename . "~/org/")
  (front-context-string . "inbox.org\n  -rw-")
