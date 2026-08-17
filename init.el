@@ -255,7 +255,6 @@
 (require 'writing)
 (require 'spelling)
 (require 'workspaces)
-(require 'everywhere)
 (require 'roam-everywhere)
 (require 'elpher-config)
 (require 'tramp-config)
