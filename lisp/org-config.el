@@ -551,6 +551,7 @@
      (python     . t)
      (C          . t)
      (zig        . t)
+     (scheme     . t)
      (go         . t))))
 
 ;;; --- LSP in org-src buffers -------------------------------------------
