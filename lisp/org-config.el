@@ -523,6 +523,9 @@
               (org-element-property :end context)))))))))
 
 (use-package ob-go :demand t)
+(use-package ob-zig
+  :ensure (ob-zig :host github :repo "jolby/ob-zig.el")
+  :after org)
 
 ;; Refile to org-agenda nodes
 (setq org-refile-targets
@@ -540,12 +543,14 @@
   (require 'ob-python)
   (require 'ob-C)
   (require 'ob-go)
+  (require 'ob-zig)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell      . t)
      (emacs-lisp . t)
      (python     . t)
      (C          . t)
+     (zig        . t)
      (go         . t))))
 
 (provide 'org-config)
