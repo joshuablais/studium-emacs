@@ -122,11 +122,6 @@
   (add-to-list 'eglot-server-programs
                '(scheme-mode . ("guile-lsp-server"))))
 
-(add-hook 'before-save-hook
-          (lambda ()
-            (when (bound-and-true-p eglot--managed-mode)
-              (eglot-format-buffer))))
-
 ;; ELDOC BOX
 (use-package eldoc-box
   :ensure t

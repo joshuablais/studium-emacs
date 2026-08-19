@@ -558,7 +558,7 @@
 ;; request is keyed on textDocument/uri. Org-src buffers are marker-linked
 ;; copies with no file, so `eglot-ensure' on the major-mode hook silently
 ;; declines. This gives the buffer an on-disk identity in `org-src-mode-hook',
-;; which runs before eglot's deferred post-command-hook connect.
+;; then asks eglot again now that the guard will pass.
 
 (defvar my/org-src-lsp-extensions
   '((go-ts-mode        . "go")
@@ -589,6 +589,42 @@
     (eglot-ensure)))
 
 (add-hook 'org-src-mode-hook #'my/org-src-attach-file)
+
+;; Formatting. `before-save-hook' already fires in org-src buffers, since
+;; `basic-save-buffer' runs it before `write-contents-functions' (where
+;; `org-edit-src-save' lives). `C-c '' bypasses saving entirely, so exit
+;; needs its own advice.
+
+(defun my/eglot-format-on-save ()
+  "Format via LSP when a server manages this buffer.
+Errors are demoted: a fragment the server cannot parse must never
+block a save or trap you inside an org-src buffer."
+  (when (bound-and-true-p eglot--managed-mode)
+    (condition-case err
+        (eglot-format-buffer)
+      (error (message "eglot format skipped: %s" (error-message-string err))))))
+
+(add-hook 'before-save-hook #'my/eglot-format-on-save)
+
+(defun my/org-src-format-before-exit ()
+  (when (and (bound-and-true-p org-src-mode)
+             (bound-and-true-p eglot--managed-mode))
+    (my/eglot-format-on-save)))
+
+;; Not on `org-edit-src-abort' — formatting text you are discarding is waste.
+(advice-add 'org-edit-src-exit :before #'my/org-src-format-before-exit)
+
+;; Filenames are md5 of the buffer name, so they are stable rather than
+;; unbounded — but they go stale on every edit, and a stale .zig sitting
+;; beside real source will eventually mislead something.
+(defun my/org-src-cleanup-lsp-file ()
+  (when (and (bound-and-true-p org-src-mode)
+             buffer-file-name
+             (string-match-p "/\\.org-src-lsp/" buffer-file-name)
+             (file-exists-p buffer-file-name))
+    (delete-file buffer-file-name)))
+
+(add-hook 'kill-buffer-hook #'my/org-src-cleanup-lsp-file)
 
 (provide 'org-config)
 ;;; org-mode-config.el ends here
