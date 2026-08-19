@@ -553,5 +553,42 @@
      (zig        . t)
      (go         . t))))
 
+;;; --- LSP in org-src buffers -------------------------------------------
+;; Eglot refuses to manage buffers with no `buffer-file-name' — every LSP
+;; request is keyed on textDocument/uri. Org-src buffers are marker-linked
+;; copies with no file, so `eglot-ensure' on the major-mode hook silently
+;; declines. This gives the buffer an on-disk identity in `org-src-mode-hook',
+;; which runs before eglot's deferred post-command-hook connect.
+
+(defvar my/org-src-lsp-extensions
+  '((go-ts-mode        . "go")
+    (go-mode           . "go")
+    (zig-mode          . "zig")
+    (python-ts-mode    . "py")
+    (c-ts-mode         . "c")
+    (js-ts-mode        . "js")
+    (css-ts-mode       . "css")
+    (html-ts-mode      . "html")
+    (nix-ts-mode       . "nix")
+    (templ-ts-mode     . "templ")
+    (terraform-ts-mode . "tf"))
+  "Major mode to file extension, for giving org-src buffers an LSP identity.")
+
+(defun my/org-src-attach-file ()
+  (when-let* ((ext (alist-get major-mode my/org-src-lsp-extensions))
+              (dir (expand-file-name ".org-src-lsp/" default-directory))
+              (file (expand-file-name
+                     (format "%s.%s" (md5 (buffer-name)) ext) dir)))
+    (make-directory dir t)
+    (write-region (point-min) (point-max) file nil 'silent)
+    (setq buffer-file-name file
+          buffer-file-truename file)
+    (set-buffer-modified-p nil)
+    ;; `eglot-ensure' on the major-mode hook already ran and declined, because
+    ;; `buffer-file-name' was nil at that point. Ask again now that it isn't.
+    (eglot-ensure)))
+
+(add-hook 'org-src-mode-hook #'my/org-src-attach-file)
+
 (provide 'org-config)
 ;;; org-mode-config.el ends here
