@@ -2,12 +2,18 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("Media"
-  (filename . "~/Development/Media/")
-  (front-context-string . "SacroSanctum\n  d")
-  (rear-context-string . "96 Aug 12 16:36 ")
-  (position . 610)
-  (last-modified 27262 2423 201519 696000))
+(("Library"
+  (filename . "~/Library/")
+  (front-context-string . "Altered Carbon -")
+  (rear-context-string . "98 Jul 30 21:09 ")
+  (position . 10606)
+  (last-modified 27272 33903 766630 12000))
+("Media"
+ (filename . "~/Development/Media/")
+ (front-context-string . "SacroSanctum\n  d")
+ (rear-context-string . "96 Aug 12 16:36 ")
+ (position . 610)
+ (last-modified 27262 2423 201519 696000))
 ("org-refile-last-stored"
  (filename . "~/org/done.org")
  (front-context-string . "** DONE Update S")
@@ -27,11 +33,11 @@
  (position . 137)
  (last-modified 27259 56250 648817 807000))
 ("org-capture-last-stored"
- (filename . "~/org/roam/daily/2026-08-19.org")
- (front-context-string . "* 12:32: \nIn org")
- (rear-context-string . "issance]]\n:END:\n")
- (position . 1461)
- (last-modified 27269 63176 23152 336000))
+ (filename . "~/org/notes.org")
+ (front-context-string . "** [2026-08-21 F")
+ (rear-context-string . " Notes\n\n* Inbox\n")
+ (position . 25)
+ (last-modified 27272 29351 149310 401000))
 ("org"
  (filename . "~/org/")
  (front-context-string . "inbox.org\n  -rw-")
