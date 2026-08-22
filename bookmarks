@@ -37,7 +37,7 @@
  (front-context-string . "** [2026-08-21 F")
  (rear-context-string . " Notes\n\n* Inbox\n")
  (position . 25)
- (last-modified 27272 29351 149310 401000))
+ (last-modified 27272 53200 836268 696000))
 ("org"
  (filename . "~/org/")
  (front-context-string . "inbox.org\n  -rw-")
