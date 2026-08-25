@@ -272,7 +272,7 @@
 (require 'jb-clipboard-manager)
 (require 'pomodoro)
 (require 'crm-config)
-(require 'posse-twitter)
+(require 'posse-social)
 (require 'post-to-blog)
 (require 'done-refile)
 (require 'create-daily)

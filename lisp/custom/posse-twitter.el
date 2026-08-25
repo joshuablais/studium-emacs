@@ -1,7 +1,7 @@
 ;;; my-posse.el --- Multi-platform POSSE system -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; POSSE system that posts to both Twitter and Mastodon using authinfo.gpg credentials
+;; POSSE system that posts to both Bluesky and Mastodon using authinfo.gpg credentials
 
 ;;; Code:
 
@@ -16,16 +16,16 @@
 (defvar my-microblog-images-dir "~/Development/joshuablais.com/public/images/microblog/"
   "Directory to store microblog images.")
 
-(defun my-post-tweet ()
-  "Compose and post to both Twitter and Mastodon."
+(defun my-post-social ()
+  "Compose and post to both Bluesky and Mastodon."
   (interactive)
 
   ;; Create composer buffer
-  (let ((buf (get-buffer-create "*Tweet Composer*")))
+  (let ((buf (get-buffer-create "*Post Composer*")))
     (with-current-buffer buf
       (erase-buffer)
-      (insert "# Compose your post below (500 chars for Twitter compatibility):\n\n")
-      (insert "This will be posted to both Twitter and Mastodon.")
+      (insert "# Compose your post below (300 chars for Bluesky compatibility):\n\n")
+      (insert "This will be posted to both Bluesky and Mastodon.")
       (org-mode)
       (goto-char (point-max))
 
@@ -34,7 +34,7 @@
       ;; Custom keymap for this buffer
       (use-local-map (copy-keymap org-mode-map))
       (local-set-key (kbd "C-c C-c")
-                     (lambda () (interactive) (my-send-tweet-from-buffer)))
+                     (lambda () (interactive) (my-send-post-from-buffer)))
       (local-set-key (kbd "C-c C-a")
                      (lambda () (interactive) (my-select-media-for-tweet)))
       (local-set-key (kbd "C-c C-k")
@@ -53,7 +53,7 @@
     (if (and file
              (file-exists-p file)
              (string-match-p "\\(?:png\\|jpg\\|jpeg\\|gif\\|mp4\\)$" file))
-        (with-current-buffer "*Tweet Composer*"
+        (with-current-buffer "*Post Composer*"
           (setq-local media-path file)
           (message "Media selected: %s" (file-name-nondirectory file)))
       (message "Error: Selected file does not exist or is not a supported media type."))))
@@ -65,20 +65,16 @@
     (when secret-fn
       (string-trim (funcall secret-fn)))))
 
-(defun my-get-twitter-credentials ()
-  "Get Twitter credentials from auth-source."
-  (let ((consumer-key (my-get-auth-secret "api.twitter.com" "TwitterAPI"))
-        (consumer-secret (my-get-auth-secret "api.twitter.com.consumer" "TwitterAPI"))
-        (access-token (my-get-auth-secret "api.twitter.com.token" "TwitterAPI"))
-        (access-token-secret (my-get-auth-secret "api.twitter.com.secret" "TwitterAPI")))
+(defun my-get-bluesky-credentials ()
+  "Get Bluesky credentials from auth-source."
+  (let ((identifier (my-get-auth-secret "bsky.social" "BlueskyAPI"))
+        (app-password (my-get-auth-secret "bsky.social.password" "BlueskyAPI")))
 
-    (unless (and consumer-key consumer-secret access-token access-token-secret)
-      (error "Missing Twitter credentials. Check your ~/.authinfo.gpg file"))
+    (unless (and identifier app-password)
+      (error "Missing Bluesky credentials. Check your ~/.authinfo.gpg file"))
 
-    (list :consumer-key consumer-key
-          :consumer-secret consumer-secret
-          :access-token access-token
-          :access-token-secret access-token-secret)))
+    (list :identifier identifier
+          :app-password app-password)))
 
 (defun my-get-mastodon-credentials ()
   "Get Mastodon credentials from auth-source."
@@ -144,8 +140,8 @@
                (if (string-empty-p image-url) "no image" "with image")
                (if (string-empty-p text) "no text" (format "%.50s..." text))))))
 
-(defun my-send-tweet-from-buffer ()
-  "Send the post to Twitter, Mastodon, AND local microblog."
+(defun my-send-post-from-buffer ()
+  "Send the post to Bluesky, Mastodon, AND local microblog."
   (interactive)
   (let* ((content (buffer-substring-no-properties
                    (save-excursion
@@ -153,38 +149,36 @@
                      (forward-line 2)
                      (point))
                    (point-max)))
-         (tweet-text (string-trim content))
+         (post-text (string-trim content))
          (media (buffer-local-value 'media-path (current-buffer)))
-         (twitter-creds (my-get-twitter-credentials))
+         (bluesky-creds (my-get-bluesky-credentials))
          (mastodon-creds (my-get-mastodon-credentials)))
 
     (cond
-     ((and (string-empty-p tweet-text) (not media))
+     ((and (string-empty-p post-text) (not media))
       (message "Post must contain either text or media (or both)."))
-     ((and (not (string-empty-p tweet-text)) (> (length tweet-text) 500))
-      (message "Post exceeds 500 characters (%d). Please shorten it."
-               (length tweet-text)))
+     ((and (not (string-empty-p post-text)) (> (length post-text) 300))
+      (message "Post exceeds 300 characters (%d). Please shorten it."
+               (length post-text)))
      ((and media (not (file-exists-p media)))
       (message "Selected media file does not exist: %s" media))
      (t
       ;; Add to local microblog
-      (my-add-to-microblog tweet-text media)
+      (my-add-to-microblog post-text media)
 
       ;; Prepare environment with credentials
       (let ((temp-file (make-temp-file "post-" nil ".txt"))
             (process-environment
              (append
               (list
-               (format "TWITTER_CONSUMER_KEY=%s" (plist-get twitter-creds :consumer-key))
-               (format "TWITTER_CONSUMER_SECRET=%s" (plist-get twitter-creds :consumer-secret))
-               (format "TWITTER_ACCESS_TOKEN=%s" (plist-get twitter-creds :access-token))
-               (format "TWITTER_ACCESS_TOKEN_SECRET=%s" (plist-get twitter-creds :access-token-secret))
+               (format "BLUESKY_IDENTIFIER=%s" (plist-get bluesky-creds :identifier))
+               (format "BLUESKY_APP_PASSWORD=%s" (plist-get bluesky-creds :app-password))
                (format "MASTODON_INSTANCE=%s" (plist-get mastodon-creds :instance))
                (format "MASTODON_ACCESS_TOKEN=%s" (plist-get mastodon-creds :access-token)))
               process-environment)))
 
         (with-temp-file temp-file
-          (insert tweet-text))
+          (insert post-text))
 
         (let* ((media-arg (when media (format " --media %s" (shell-quote-argument media))))
                (command (format "%s --text-file %s%s"
@@ -200,7 +194,7 @@
                   (kill-buffer))
               (message "Microblog: ✓ | Social: %s" result)))))))))
 
-(global-set-key (kbd "C-c t t") #'my-post-tweet)
+(global-set-key (kbd "C-c t t") #'my-post-social)
 
-(provide 'posse-twitter)
+(provide 'posse-social)
 ;;; my-posse.el ends here
