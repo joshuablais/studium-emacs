@@ -69,8 +69,7 @@
         ("\\.pdf$" . my-browse-url-pdf)
         ("^gemini://" . elpher-browse-url-elpher)
         ("^gopher://" . elpher-browse-url-elpher)
-        (,(regexp-opt jb/chromium-domains) . jb/browse-url-chromium)
-        ("." . eww-browse-url)))
+        ("." . jb/browse-url-chromium)))
 
 (setq browse-url-secondary-browser-function #'jb/browse-url-chromium)
 
