@@ -138,4 +138,86 @@
              jb/browser-debug-port id))
     (shell-command "swaymsg '[app_id=\"chromium\" ] focus' || swaymsg '[app_id=\"firefox\"] focus'")))
 
+(defvar jb/bookmarks-file "~/org/bookmarks.org")
+
+(defun jb/org-heading-paths (file)
+  "Return alist of (OUTLINE-PATH . MARKER) for every heading in FILE."
+  (with-current-buffer (find-file-noselect file)
+    (org-with-wide-buffer
+     (let (paths)
+       (org-map-entries
+        (lambda ()
+          (push (cons (mapconcat #'identity (org-get-outline-path t) "/")
+                      (point-marker))
+                paths))
+        nil 'file)
+       (nreverse paths)))))
+
+(defun jb/org-find-or-create-olp (file path)
+  "Find or create the heading at outline PATH (list of strings) in FILE.
+Returns a marker at the (possibly newly created) heading."
+  (with-current-buffer (find-file-noselect file)
+    (widen)
+    (let (marker)
+      (dolist (heading path)
+        (let* ((search-start (if marker (marker-position marker) (point-min)))
+               (search-end (if marker
+                               (save-excursion (goto-char marker)
+                                               (org-end-of-subtree t t)
+                                               (point))
+                             (point-max)))
+               (level (if marker
+                          (1+ (org-with-point-at marker (org-current-level)))
+                        1))
+               found)
+          (goto-char search-start)
+          (when marker (forward-line 1))
+          (while (and (not found) (< (point) search-end)
+                      (re-search-forward
+                       (format "^\\*\\{%d\\} \\(.*\\)$" level) search-end t))
+            (when (string= (string-trim (match-string 1)) heading)
+              (setq found (line-beginning-position))))
+          (setq marker
+                (if found
+                    (progn (goto-char found) (point-marker))
+                  (goto-char search-end)
+                  (unless (bolp) (insert "\n"))
+                  (insert (make-string level ?*) " " heading "\n")
+                  (forward-line -1)
+                  (point-marker)))))
+      marker)))
+
+(defun jb/bookmark-browser-tab ()
+  "Bookmark a CDP browser tab into a chosen or newly created heading."
+  (interactive)
+  (let* ((tabs (jb/browser-tabs))
+         (tab-cands (mapcar (lambda (tab)
+                              (cons (format "%s  %s"
+                                            (alist-get 'title tab)
+                                            (alist-get 'url tab))
+                                    tab))
+                            tabs))
+         (tab (cdr (assoc (completing-read "Bookmark tab: "
+                                           (mapcar #'car tab-cands) nil t)
+                          tab-cands)))
+         (title (alist-get 'title tab))
+         (url (alist-get 'url tab))
+         (headings (jb/org-heading-paths (expand-file-name jb/bookmarks-file)))
+         (choice (completing-read "Category: " (mapcar #'car headings)))
+         (existing (assoc choice headings))
+         (target (if existing
+                     (cdr existing)
+                   (jb/org-find-or-create-olp
+                    (expand-file-name jb/bookmarks-file)
+                    (split-string choice "/" t)))))
+    (with-current-buffer (marker-buffer target)
+      (org-with-wide-buffer
+       (goto-char target)
+       (org-end-of-subtree t t)
+       (unless (bolp) (insert "\n"))
+       (insert (format "- [[%s][%s]] %s\n"
+                       url title (format-time-string "[%Y-%m-%d]")))
+       (save-buffer)))
+    (message "Bookmarked \"%s\" under %s" title choice)))
+
 (provide 'browser)
