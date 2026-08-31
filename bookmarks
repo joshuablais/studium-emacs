@@ -2,12 +2,18 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("Library"
-  (filename . "~/Library/")
-  (front-context-string . "Altered Carbon -")
-  (rear-context-string . "98 Jul 30 21:09 ")
-  (position . 10606)
-  (last-modified 27272 33903 766630 12000))
+(("bookmarks.org"
+  (filename . "~/org/bookmarks.org")
+  (front-context-string . ":TAGS:     blogs")
+  (rear-context-string . "6-20 Fri 21:42]\n")
+  (position . 3747)
+  (last-modified 27284 63452 819197 19000))
+("Library"
+ (filename . "~/Library/")
+ (front-context-string . "Altered Carbon -")
+ (rear-context-string . "98 Jul 30 21:09 ")
+ (position . 10606)
+ (last-modified 27272 33903 766630 12000))
 ("Media"
  (filename . "~/Development/Media/")
  (front-context-string . "SacroSanctum\n  d")
@@ -33,11 +39,11 @@
  (position . 137)
  (last-modified 27259 56250 648817 807000))
 ("org-capture-last-stored"
- (filename . "~/org/notes.org")
- (front-context-string . "** [2026-08-21 F")
- (rear-context-string . " Notes\n\n* Inbox\n")
- (position . 25)
- (last-modified 27272 53200 836268 696000))
+ (filename . "~/org/roam/daily/2026-08-31.org")
+ (front-context-string . "* 06:10: Tweets\n")
+ (rear-context-string . "letags: :daily:\n")
+ (position . 115)
+ (last-modified 27285 28570 955474 707000))
 ("org"
  (filename . "~/org/")
  (front-context-string . "inbox.org\n  -rw-")
