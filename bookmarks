@@ -44,6 +44,12 @@
  (rear-context-string . "letags: :daily:\n")
  (position . 115)
  (last-modified 27285 28570 955474 707000))
+("notes"
+ (filename . "~/org/notes.org")
+ (front-context-string . "** [2026-08-21 F")
+ (rear-context-string . " Notes\n\n* Inbox\n")
+ (position . 25)
+ (last-modified 27272 53200 836268 696000))
 ("org"
  (filename . "~/org/")
  (front-context-string . "inbox.org\n  -rw-")
@@ -104,5 +110,4 @@
  (front-context-string . "components\n  drw")
  (rear-context-string . "96 Jun 30 13:39 ")
  (position . 154)
- (last-modified 27233 11312 20727 345000))
-)
+ (last-modified 27233 11312 20727 345000)))
