@@ -20,8 +20,7 @@
   :init
   (setq forge-add-default-bindings t)
   :config
-  (dolist (entry '(("codeberg.org" "codeberg.org/api/v1" "codeberg.org" forge-gitea-repository)
-                   ("forge.labrynth.org" "forge.labrynth.org/api/v1" "forge.labrynth.org" forge-gitea-repository)))
+  (dolist (entry '(("forge.labrynth.org" "forge.labrynth.org/api/v1" "forge.labrynth.org" forge-forgejo-repository)))
     (add-to-list 'forge-alist entry)))
 (elpaca-wait)
 

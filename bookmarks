@@ -2,12 +2,24 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("music tracker"
-  (filename . "~/Documents/music/music-tracker/index.org")
-  (front-context-string . "               |")
-  (rear-context-string . "9/10          | ")
-  (position . 5431)
-  (last-modified 27290 57396 951993 162000))
+(("renaissance playlist"
+  (filename . "~/Development/playlist/")
+  (front-context-string . "index.html\n  -rw")
+  (rear-context-string . "30 Sep  9 09:59 ")
+  (position . 87)
+  (last-modified 27297 33400 114657 131000))
+("renaissance books"
+ (filename . "~/Development/books/README.org")
+ (front-context-string . "#+title: Books\n\n")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27297 16577 811372 388000))
+("music tracker"
+ (filename . "~/Documents/music/music-tracker/index.org")
+ (front-context-string . "               |")
+ (rear-context-string . "9/10          | ")
+ (position . 5431)
+ (last-modified 27290 57396 951993 162000))
 ("bookmarks.org"
  (filename . "~/org/bookmarks.org")
  (front-context-string . ":TAGS:     blogs")
@@ -45,11 +57,11 @@
  (position . 137)
  (last-modified 27259 56250 648817 807000))
 ("org-capture-last-stored"
- (filename . "~/org/inbox.org")
- (front-context-string . "** TODO Send CC ")
- (rear-context-string . "sers/email/etc.\n")
- (position . 1235)
- (last-modified 27286 13084 124086 237000))
+ (filename . "~/org/roam/daily/2026-09-09.org")
+ (front-context-string . "* 08:42: \nCan I ")
+ (rear-context-string . "luttringhausen/\n")
+ (position . 189)
+ (last-modified 27297 28792 661424 476000))
 ("notes"
  (filename . "~/org/notes.org")
  (front-context-string . "** [2026-08-21 F")
