@@ -56,7 +56,7 @@
   (let ((file (expand-file-name (read-file-name "Select media file: " nil nil t))))
     (if (and file
              (file-exists-p file)
-             (string-match-p "\\(?:png\\|jpg\\|jpeg\\|gif\\|mp4\\)$" file))
+             (string-match-p "\\(?:png\\|jpg\\|jpeg\\|gif\\|webp\\|mp4\\)$" file))
         (with-current-buffer "*Post Composer*"
           (setq-local media-path file)
           (message "Media selected: %s" (file-name-nondirectory file)))
