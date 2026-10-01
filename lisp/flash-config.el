@@ -14,9 +14,4 @@
   (require 'flash-isearch)
   (flash-isearch-mode 1))
 
-;; (use-package avy
-;;   :ensure t
-;;   :config
-;;   (setq avy-background t)
-
 (provide 'flash-config)
