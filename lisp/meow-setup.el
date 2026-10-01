@@ -433,7 +433,7 @@
 ;; Save
 ;; (global-set-key (kbd "C-v") #'clipboard-yank)
 ;; (define-key minibuffer-local-map (kbd "C-v") #'yank)
-(global-set-key (kbd "C-s") #'save-buffer)
+;; (global-set-key (kbd "C-s") #'save-buffer)
 (global-set-key (kbd "C-r") #'undo-tree-redo)
 
 (defun studium/increment-number (arg)
