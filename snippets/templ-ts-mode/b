@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: bold
+# key: <b
+# --
+<b>$1</b>

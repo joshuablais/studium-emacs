@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: unordered-list
+# key: ul
+# --
+<ul>
+    <li>$1</li>
+</ul>
