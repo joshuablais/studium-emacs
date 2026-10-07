@@ -38,10 +38,5 @@
   (centaur-tabs-mode 1)
   (centaur-tabs-group-by-projectile-project))
 
-;; Keybindings — match Doom's defaults
-(with-eval-after-load 'centaur-tabs
-  (define-key centaur-tabs-mode-map (kbd "<C-tab>")         #'centaur-tabs-forward)
-  (define-key centaur-tabs-mode-map (kbd "<C-iso-lefttab>") #'centaur-tabs-backward))
-
 (provide 'tabs)
 ;;; tabs.el ends here

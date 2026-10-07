@@ -32,7 +32,7 @@
    '("," . consult-buffer)
    '("b k" . (lambda () (interactive) (kill-buffer (current-buffer))))
    '("b l" . (lambda () (interactive) (switch-to-buffer nil)))
-   '("b b" . switch-to-buffer)
+   ;; '("b b" . switch-to-buffer)
    '("b n" . next-buffer)
    '("b i" . ibuffer)
    '("b S" . my/save-all-buffers)
@@ -84,13 +84,13 @@
    '("<TAB> l" . easysession-switch-to)
    '("<TAB> R" . easysession-rename)
    '("<TAB> D" . easysession-delete)
-   '("<TAB> <TAB>" . +workspace/display)
+   ;; '("<TAB> <TAB>" . +workspace/display)
    '("<TAB> n" . +workspace/new)
    '("<TAB> d" . +workspace/delete)
    '("<TAB> r" . +workspace/rename)
-   '("<TAB> ." . +workspace/switch-to)
-   '("<TAB> [" . tab-bar-switch-to-prev-tab)
-   '("<TAB> ]" . tab-bar-switch-to-next-tab)
+   '("<TAB> <TAB>" . +workspace/switch-to)
+   ;; '("<TAB> [" . tab-bar-switch-to-prev-tab)
+   ;; '("<TAB> ]" . tab-bar-switch-to-next-tab)
    '("p p" . +workspace/switch-to-project)
 
    ;; Testing
@@ -392,8 +392,8 @@
       (message "Buffer is not visiting a file"))))
 
 ;; Tabs
-(global-set-key (kbd "C-<tab>")   #'tab-next)
-(global-set-key (kbd "C-S-<tab>") #'tab-previous)
+(global-set-key (kbd "C-<tab>")   #'switch-to-buffer)
+;; (global-set-key (kbd "C-S-<tab>") #'tab-previous)
 
 ;; Eval region
 (global-set-key (kbd "C-x C-r") #'eval-region)
