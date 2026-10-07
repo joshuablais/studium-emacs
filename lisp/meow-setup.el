@@ -304,21 +304,15 @@
       (message "Buffer is not visiting a file"))))
 
 (global-set-key (kbd "C-b")   #'switch-to-buffer)
-
-;; Eval region
 (global-set-key (kbd "C-x C-r") #'eval-region)
-
-;; Set register jumppoints
 (global-set-key (kbd "C-c M") #'consult-register-store)
 (global-set-key (kbd "C-c J") #'consult-register)
-
-;; Window movement
-;; (global-set-key (kbd "C-w") #'backward-kill-word)
 (global-set-key (kbd "C-<left>")  #'windmove-left)
 (global-set-key (kbd "C-<right>") #'windmove-right)
 (global-set-key (kbd "C-<down>")  #'windmove-down)
 (global-set-key (kbd "C-<up>")    #'windmove-up)
 
+;; Resizing windows
 (global-set-key (kbd "S-<right>") (lambda () (interactive)
                                     (if (window-in-direction 'left)
                                         (shrink-window-horizontally 5)
