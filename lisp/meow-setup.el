@@ -1,8 +1,5 @@
 ;;; meow-setup.el --- Description -*- lexical-binding: t; -*-
 
-;; Setup if there are any leader keys breaking
-;; (defvar my-leader-map (make-sparse-keymap) "Primary leader keymap.")
-
 ;; define keys
 (setq meow-keypad-ctrl-meta-prefix ?G)
 (setq meow-keypad-meta-prefix ?M)
@@ -23,18 +20,10 @@
    '("SPC" . project-find-file)
    '("p R" . project-query-replace-regexp)
 
-   ;; Window bindings
-   '("w v" . split-window-right)
-   '("w s" . split-window-below)
-   ;; '("w d" . delete-window)
-
    ;; Buffer
    '("," . consult-buffer)
    '("b k" . (lambda () (interactive) (kill-buffer (current-buffer))))
    '("b l" . (lambda () (interactive) (switch-to-buffer nil)))
-   ;; '("b b" . switch-to-buffer)
-   ;; '("b n" . next-buffer)
-   ;; '("b i" . ibuffer)
    '("b S" . my/save-all-buffers)
 
    ;; Bookmarks
@@ -104,10 +93,6 @@
    '("m d" . emms-play-directory-tree)
    '("m p" . emms-playlist-mode-go)
    '("m h" . emms-shuffle)
-   '("m x" . emms-pause)
-   '("m s" . emms-stop)
-   '("m b" . emms-previous)
-   '("m n" . emms-next)
    '("m o" . emms-browser)
 
    '("f p" . (lambda () (interactive)
@@ -118,10 +103,6 @@
                  (call-interactively #'find-file)))))
 
   (meow-motion-define-key
-   ;; Yank
-   '("y" . meow-clipboard-save)
-   '("g" . meow-cancel-selection)
-   ;; Jump
    '("f" . flash-jump)
    '("/" . consult-line)
    '("<escape>" . ignore))
