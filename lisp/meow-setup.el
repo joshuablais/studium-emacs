@@ -184,8 +184,8 @@
    '("N" . meow-next-expand)
    '("o" . meow-open-below)
    '("O" . meow-open-above)
-   '("p" . studium/paste-below)
-   '("P" . studium/paste-above)
+   ;; '("p" . studium/paste-below)
+   ;; '("P" . studium/paste-above)
    ;; '("C-v" . my/meow-paste)
    '("q" . meow-quit)
    '("Q" . kmacro-start-macro-or-insert-counter)
@@ -288,63 +288,6 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
-(defun studium/paste-below ()
-  "Vim p: paste after cursor (characterwise) or below current line (linewise)."
-  (interactive)
-  (when (null kill-ring)
-    (user-error "Kill ring is empty"))
-  (let ((text (current-kill 0)))
-    (cond
-     ;; Active region: replace selection, old selection → kill-ring
-     ((use-region-p)
-      (let ((beg (region-beginning)))
-        (kill-region (region-beginning) (region-end))
-        (insert text)
-        (goto-char beg)))
-     ;; Linewise: paste below current line, cursor to first non-blank
-     ((string-suffix-p "\n" text)
-      (let* ((content (substring text 0 (1- (length text))))
-             (target nil))
-        (end-of-line)
-        (insert "\n")
-        (setq target (point))
-        (insert content)
-        (goto-char target)
-        (back-to-indentation)))
-     ;; Characterwise: paste after cursor, cursor on last pasted char
-     (t
-      (unless (or (eobp) (eolp))
-        (forward-char 1))
-      (insert text)
-      (backward-char 1)))))
-
-(defun studium/paste-above ()
-  "Vim P: paste before cursor (characterwise) or above current line (linewise)."
-  (interactive)
-  (when (null kill-ring)
-    (user-error "Kill ring is empty"))
-  (let ((text (current-kill 0)))
-    (cond
-     ;; Active region: replace selection, old selection → kill-ring
-     ((use-region-p)
-      (let ((beg (region-beginning)))
-        (kill-region (region-beginning) (region-end))
-        (insert text)
-        (goto-char beg)))
-     ;; Linewise: paste above current line, cursor to first non-blank
-     ((string-suffix-p "\n" text)
-      (let* ((content (substring text 0 (1- (length text))))
-             (target nil))
-        (beginning-of-line)
-        (setq target (point))
-        (insert content "\n")
-        (goto-char target)
-        (back-to-indentation)))
-     ;; Characterwise: paste before cursor, cursor on last pasted char
-     (t
-      (insert text)
-      (backward-char 1)))))
-
 (defun my/indent-right ()
   "Indent region or line right."
   (interactive)
@@ -414,42 +357,6 @@
                                     (if (window-in-direction 'above)
                                         (shrink-window 2)
                                       (enlarge-window 2))))
-
-;; Zoom
-(global-set-key (kbd "C-=") #'text-scale-increase)
-(global-set-key (kbd "C--") #'text-scale-decrease)
-
-;; Save
-;; (global-set-key (kbd "C-v") #'clipboard-yank)
-;; (define-key minibuffer-local-map (kbd "C-v") #'yank)
-;; (global-set-key (kbd "C-s") #'save-buffer)
-;; (global-set-key (kbd "C-r") #'undo-tree-redo)
-
-;; (defun studium/increment-number (arg)
-;;   "Increment number at point by ARG."
-;;   (interactive "p")
-;;   (save-excursion
-;;     (skip-chars-backward "0-9")
-;;     (when (looking-at "[0-9]+")
-;;       (replace-match
-;;        (number-to-string (+ arg (string-to-number (match-string 0))))))))
-
-;; (defun studium/decrement-number (arg)
-;;   "Decrement number at point by ARG."
-;;   (interactive "p")
-;;   (studium/increment-number (- arg)))
-
-;; (global-set-key (kbd "C-S-<up>") #'studium/increment-number)
-;; (global-set-key (kbd "C-S-<down>") #'studium/decrement-number)
-
-(defun my/replace-string-smart (from to)
-  "Replace string from point to end, or within region if active."
-  (interactive "sReplace: \nsReplace %s with: ")
-  (let ((start (if (use-region-p) (region-beginning) (point)))
-        (end (if (use-region-p) (region-end) (point-max))))
-    (replace-string from to nil start end)))
-
-(global-set-key (kbd "M-#") #'my/replace-string-smart)
 
 (provide 'meow-setup)
 ;;; meow-setup.el ends here
