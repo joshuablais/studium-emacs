@@ -26,15 +26,15 @@
    ;; Window bindings
    '("w v" . split-window-right)
    '("w s" . split-window-below)
-   '("w d" . delete-window)
+   ;; '("w d" . delete-window)
 
    ;; Buffer
    '("," . consult-buffer)
    '("b k" . (lambda () (interactive) (kill-buffer (current-buffer))))
    '("b l" . (lambda () (interactive) (switch-to-buffer nil)))
    ;; '("b b" . switch-to-buffer)
-   '("b n" . next-buffer)
-   '("b i" . ibuffer)
+   ;; '("b n" . next-buffer)
+   ;; '("b i" . ibuffer)
    '("b S" . my/save-all-buffers)
 
    ;; Bookmarks
@@ -113,17 +113,6 @@
    '("m n" . emms-next)
    '("m o" . emms-browser)
 
-   ;; meow digits
-   '("1" . meow-digit-argument)
-   '("2" . meow-digit-argument)
-   '("3" . meow-digit-argument)
-   '("4" . meow-digit-argument)
-   '("5" . meow-digit-argument)
-   '("6" . meow-digit-argument)
-   '("7" . meow-digit-argument)
-   '("8" . meow-digit-argument)
-   '("9" . meow-digit-argument)
-   '("0" . meow-digit-argument)
    '("f p" . (lambda () (interactive)
                (let ((default-directory "~/.config/guix/dotfiles/emacs/"))
                  (call-interactively #'find-file))))
@@ -133,8 +122,8 @@
 
   (meow-motion-define-key
    ;; Navigation
-   '("W" . meow-next-word)
-   '("^" . back-to-indentation)
+   ;; '("W" . meow-next-word)
+   ;; '("^" . back-to-indentation)
    '("L" . (lambda () (interactive) (meow-line 1) (meow-reverse)))
    '("l" . meow-line)
    '("M" . meow-mark-symbol)
@@ -434,24 +423,24 @@
 ;; (global-set-key (kbd "C-v") #'clipboard-yank)
 ;; (define-key minibuffer-local-map (kbd "C-v") #'yank)
 ;; (global-set-key (kbd "C-s") #'save-buffer)
-(global-set-key (kbd "C-r") #'undo-tree-redo)
+;; (global-set-key (kbd "C-r") #'undo-tree-redo)
 
-(defun studium/increment-number (arg)
-  "Increment number at point by ARG."
-  (interactive "p")
-  (save-excursion
-    (skip-chars-backward "0-9")
-    (when (looking-at "[0-9]+")
-      (replace-match
-       (number-to-string (+ arg (string-to-number (match-string 0))))))))
+;; (defun studium/increment-number (arg)
+;;   "Increment number at point by ARG."
+;;   (interactive "p")
+;;   (save-excursion
+;;     (skip-chars-backward "0-9")
+;;     (when (looking-at "[0-9]+")
+;;       (replace-match
+;;        (number-to-string (+ arg (string-to-number (match-string 0))))))))
 
-(defun studium/decrement-number (arg)
-  "Decrement number at point by ARG."
-  (interactive "p")
-  (studium/increment-number (- arg)))
+;; (defun studium/decrement-number (arg)
+;;   "Decrement number at point by ARG."
+;;   (interactive "p")
+;;   (studium/increment-number (- arg)))
 
-(global-set-key (kbd "C-S-<up>") #'studium/increment-number)
-(global-set-key (kbd "C-S-<down>") #'studium/decrement-number)
+;; (global-set-key (kbd "C-S-<up>") #'studium/increment-number)
+;; (global-set-key (kbd "C-S-<down>") #'studium/decrement-number)
 
 (defun my/replace-string-smart (from to)
   "Replace string from point to end, or within region if active."
@@ -461,13 +450,6 @@
     (replace-string from to nil start end)))
 
 (global-set-key (kbd "M-#") #'my/replace-string-smart)
-
-;; Reload config
-(defun my/reload-config ()
-  (interactive)
-  (load-file user-init-file)
-  (message "Config reloaded."))
-(global-set-key (kbd "C-c r") #'my/reload-config)
 
 (provide 'meow-setup)
 ;;; meow-setup.el ends here
