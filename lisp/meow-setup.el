@@ -50,9 +50,6 @@
    '("n r f" . org-roam-node-find)
    '("n j" . org-roam-dailies-capture-today)
 
-   ;; Magit
-   '("g" . (lambda () (interactive) (require 'magit) (magit-status)))
-
    ;; Miscellaneous
    '("!" . jb/run-command)
    '("o t" . jb/ghostel)
@@ -142,16 +139,6 @@
    '("<escape>" . ignore))
 
   (meow-normal-define-key
-   '("0" . meow-expand-0)
-   '("1" . meow-expand-1)
-   '("2" . meow-expand-2)
-   '("3" . meow-expand-3)
-   '("4" . meow-expand-4)
-   '("5" . meow-expand-5)
-   '("6" . meow-expand-6)
-   '("7" . meow-expand-7)
-   '("8" . meow-expand-8)
-   '("9" . meow-expand-9)
    '("-" . negative-argument)
    '(";" . meow-reverse)
    '("," . meow-inner-of-thing)
@@ -167,7 +154,6 @@
    '("b" . meow-back-word)
    '("c" . meow-change)
    '("C" . (lambda () (interactive) (meow-kill) (meow-insert)))
-   '("d" . studium/clipboard-kill-line-or-fold)
    '("E" . meow-prev-expand)
    '("f" . flash-jump)
    '("g" . meow-cancel-selection)
@@ -302,12 +288,6 @@
       (indent-rigidly (region-beginning) (region-end) (- tab-width))
     (indent-rigidly (line-beginning-position) (line-end-position) (- tab-width))))
 
-;;Save all buffers
-(defun my/save-all-buffers ()
-  "Save all modified buffers without prompting."
-  (interactive)
-  (save-some-buffers t))
-
 ;; File path yanking
 (defun my/yank-buffer-path (&optional root)
   "Copy current buffer's file path to kill ring."
@@ -323,9 +303,7 @@
           (message "Copied: %s" path))
       (message "Buffer is not visiting a file"))))
 
-;; Tabs
-(global-set-key (kbd "C-<tab>")   #'switch-to-buffer)
-;; (global-set-key (kbd "C-S-<tab>") #'tab-previous)
+(global-set-key (kbd "C-b")   #'switch-to-buffer)
 
 ;; Eval region
 (global-set-key (kbd "C-x C-r") #'eval-region)

@@ -1,5 +1,5 @@
 ;;; org-mode-config.el --- Description -*- lexical-binding: t; -*-
-;;; Code:
+
 (setq org-directory "~/org")
 (setq org-clock-out-when-done nil)
 (setq org-log-done 'time)
