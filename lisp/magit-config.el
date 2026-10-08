@@ -24,4 +24,7 @@
     (add-to-list 'forge-alist entry)))
 (elpaca-wait)
 
+(with-eval-after-load 'magit
+  (define-key magit-status-mode-map (kbd "p") #'magit-push))
+
 (provide 'magit-config)
