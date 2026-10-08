@@ -29,9 +29,7 @@
   (setq xref-show-xrefs-function    #'consult-xref
         xref-show-definitions-function #'consult-xref)
   :bind
-  (("C-x b"   . consult-buffer)
-   ("C-x C-f" . consult-find)
-   ("M-g g"   . consult-goto-line)
+  (("M-g g"   . consult-goto-line)
    ("M-s r"   . consult-ripgrep)
    ("M-s l"   . consult-line)
    ("M-s f"   . consult-fd)

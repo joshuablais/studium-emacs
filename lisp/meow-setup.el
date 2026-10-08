@@ -11,7 +11,6 @@
    '("?" . meow-cheatsheet)
 
    ;; Files and Consult
-   '("." . find-file)
    '("/" . consult-ripgrep)
    '("f r" . consult-recent-file)
    '("f y" . my/yank-buffer-path)
@@ -21,9 +20,6 @@
    '("p R" . project-query-replace-regexp)
 
    ;; Buffer
-   '("," . consult-buffer)
-   '("b k" . (lambda () (interactive) (kill-buffer (current-buffer))))
-   '("b l" . (lambda () (interactive) (switch-to-buffer nil)))
    '("b S" . my/save-all-buffers)
 
    ;; Bookmarks
@@ -57,13 +53,9 @@
    '("e e" . elfeed)
    '("e u" . elfeed-update)
    '("e v" . elfeed-tube-mpv)
-   '("e g" . gptel)
-   '("e s" . gptel-send)
    '("s o" . universal-launcher--web-search)
    '("s l" . link-hint-open-link)
    '("B" . my/scratch-popup)
-   '("j c" . my/jitsi-create-room)
-   '("y y" . jb/clipboard-manager)
 
    ;; Workspaces
    '("<TAB> s" . easysession-save)
@@ -112,7 +104,6 @@
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
    '("]" . meow-end-of-thing)
-   ;; '("/" . consult-line)
    '("f" . flash-jump)
    '("i" . meow-insert)
    '("l" . meow-line)
@@ -121,13 +112,6 @@
    '("M" . meow-mark-symbol)
    '("N" . meow-next-expand)
    '("@" . kmacro-end-or-call-macro)
-   '("s" . meow-change-char)
-   '("t" . meow-till)
-   '("u" . undo-tree-undo)
-   '("W" . meow-next-symbol)
-   '("x" . studium/kill-char)
-   '("X" . meow-backward-delete)
-   '("y" . meow-clipboard-save)
    '("z o" . kirigami-open-fold)
    '("z O" . kirigami-open-fold-rec)
    '("z c" . kirigami-close-fold)
@@ -211,6 +195,18 @@
       (indent-rigidly (region-beginning) (region-end) (- tab-width))
     (indent-rigidly (line-beginning-position) (line-end-position) (- tab-width))))
 
+(keymap-global-set "C-b"   #'switch-to-buffer)
+(keymap-global-set "C-x C-r" #'eval-region)
+(keymap-global-set "C-c M" #'consult-register-store)
+(keymap-global-set "C-c J" #'consult-register)
+(keymap-global-set "C-<left>"  #'windmove-left)
+(keymap-global-set "C-<right>" #'windmove-right)
+(keymap-global-set "C-<down>"  #'windmove-down)
+(keymap-global-set "C-<up>"    #'windmove-up)
+(keymap-global-set "C-x k" #'kill-current-buffer)
+(keymap-global-set "C--" #'text-scale-decrease)
+(keymap-global-set "C-=" #'text-scale-increase)
+
 ;; File path yanking
 (defun my/yank-buffer-path (&optional root)
   "Copy current buffer's file path to kill ring."
@@ -226,22 +222,12 @@
           (message "Copied: %s" path))
       (message "Buffer is not visiting a file"))))
 
-(keymap-global-set "C-b"   #'switch-to-buffer)
-(keymap-global-set "C-x C-r" #'eval-region)
-(keymap-global-set "C-c M" #'consult-register-store)
-(keymap-global-set "C-c J" #'consult-register)
-(keymap-global-set "C-<left>"  #'windmove-left)
-(keymap-global-set "C-<right>" #'windmove-right)
-(keymap-global-set "C-<down>"  #'windmove-down)
-(keymap-global-set "C-<up>"    #'windmove-up)
-(keymap-global-set "C-x k" #'kill-current-buffer)
-(keymap-global-set "C--" #'text-scale-decrease)
-(keymap-global-set "C-=" #'text-scale-increase)
-
 ;; remove undo and use consult line
 (with-eval-after-load 'undo-tree
   (keymap-unset undo-tree-map "C-/" t))
 (keymap-global-set "C-/" #'consult-line)
+(keymap-global-set "C-S-u" #'undo-only)
+(keymap-global-set "C-S-r" #'undo-tree-redo)
 
 ;; Resizing windows
 (global-set-key (kbd "S-<right>") (lambda () (interactive)
