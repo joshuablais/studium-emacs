@@ -221,7 +221,7 @@
 (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lisp/custom/" user-emacs-directory))
 
-(require 'meow-setup)
+(require 'studium-keys)
 (require 'dashboard)
 (require 'magit-config)
 (require 'mail)
