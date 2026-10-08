@@ -104,7 +104,7 @@
 
   (meow-motion-define-key
    '("f" . flash-jump)
-   '("/" . consult-line)
+   ;; '("/" . consult-line)
    '("<escape>" . ignore))
 
   (meow-normal-define-key
@@ -112,7 +112,7 @@
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
    '("]" . meow-end-of-thing)
-   '("/" . consult-line)
+   ;; '("/" . consult-line)
    '("f" . flash-jump)
    '("i" . meow-insert)
    '("l" . meow-line)
@@ -226,14 +226,22 @@
           (message "Copied: %s" path))
       (message "Buffer is not visiting a file"))))
 
-(global-set-key (kbd "C-b")   #'switch-to-buffer)
-(global-set-key (kbd "C-x C-r") #'eval-region)
-(global-set-key (kbd "C-c M") #'consult-register-store)
-(global-set-key (kbd "C-c J") #'consult-register)
-(global-set-key (kbd "C-<left>")  #'windmove-left)
-(global-set-key (kbd "C-<right>") #'windmove-right)
-(global-set-key (kbd "C-<down>")  #'windmove-down)
-(global-set-key (kbd "C-<up>")    #'windmove-up)
+(keymap-global-set "C-b"   #'switch-to-buffer)
+(keymap-global-set "C-x C-r" #'eval-region)
+(keymap-global-set "C-c M" #'consult-register-store)
+(keymap-global-set "C-c J" #'consult-register)
+(keymap-global-set "C-<left>"  #'windmove-left)
+(keymap-global-set "C-<right>" #'windmove-right)
+(keymap-global-set "C-<down>"  #'windmove-down)
+(keymap-global-set "C-<up>"    #'windmove-up)
+(keymap-global-set "C-x k" #'kill-current-buffer)
+(keymap-global-set "C--" #'text-scale-decrease)
+(keymap-global-set "C-=" #'text-scale-increase)
+
+;; remove undo and use consult line
+(with-eval-after-load 'undo-tree
+  (keymap-unset undo-tree-map "C-/" t))
+(keymap-global-set "C-/" #'consult-line)
 
 ;; Resizing windows
 (global-set-key (kbd "S-<right>") (lambda () (interactive)
