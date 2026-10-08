@@ -236,6 +236,7 @@
   "o" #'kirigami-open-fold   "O" #'kirigami-open-fold-rec
   "c" #'kirigami-close-fold
   "r" #'kirigami-open-folds  "m" #'kirigami-close-folds)
+(keymap-global-set "C-z" (cons "fold" studium-fold-map))
 
 ;; Tab behaviour
 (setq tab-always-indent 'complete)
@@ -260,7 +261,5 @@
   "Indent region or line left."
   (interactive)
   (studium--shift (- tab-width)))
-
-(keymap-global-set "C-c z" (cons "fold" studium-fold-map))
 
 (provide 'studium-keys)
