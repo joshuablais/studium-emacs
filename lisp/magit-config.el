@@ -24,10 +24,4 @@
     (add-to-list 'forge-alist entry)))
 (elpaca-wait)
 
-(add-hook 'git-commit-mode-hook #'meow-insert)
-
-(with-eval-after-load 'magit
-  (define-key magit-mode-map (kbd "SPC") nil)
-  (define-key magit-status-mode-map (kbd "p") #'magit-push))
-
 (provide 'magit-config)

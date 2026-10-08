@@ -88,10 +88,6 @@
     :hook (dired-mode . diredfl-mode))
   ;; disable yank extension before it registers y p
   (setq dirvish-yank-keys nil)
-  (define-key dirvish-mode-map (kbd "h")       #'dired-up-directory)
-  (define-key dirvish-mode-map (kbd "l")       #'dired-find-file)
-  (define-key dirvish-mode-map (kbd "j")       #'dired-next-line)
-  (define-key dirvish-mode-map (kbd "k")       #'dired-previous-line)
   (define-key dirvish-mode-map (kbd "<left>")  #'dired-up-directory)
   (define-key dirvish-mode-map (kbd "<right>") #'dired-find-file)
   (define-key dirvish-mode-map (kbd "<down>")  #'dired-next-line)
