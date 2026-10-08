@@ -7,7 +7,8 @@
 (with-eval-after-load 'org
   (setq org-modules                     '(org-habit)
         org-edit-src-content-indentation 0
-        org-hide-leading-stars           t)
+        org-hide-leading-stars           t
+        org-return-follows-link          t)
 
   ;; Heading navigation
   (define-key org-mode-map (kbd "<M-left>")  #'org-do-promote)
@@ -15,23 +16,22 @@
 
   ;; Misc
   (define-key org-mode-map (kbd "C-c C-i") #'my/org-insert-image)
-  (define-key org-mode-map (kbd "C-c e")   #'org-set-effort)
-  (define-key org-mode-map (kbd "C-c i")   #'org-clock-in)
-  (define-key org-mode-map (kbd "C-c o")   #'org-clock-out)
+  (define-key org-mode-map (kbd "C-c E")   #'org-set-effort)
+  (define-key org-mode-map (kbd "C-c I")   #'org-clock-in)
+  (define-key org-mode-map (kbd "C-c O")   #'org-clock-out)
 
   ;; Calendar date navigation
-  (with-eval-after-load 'org
-    (advice-add 'org-read-date :before
-                (lambda (&rest _)
-                  (when (keymapp org-read-date-minibuffer-local-map)
-                    (define-key org-read-date-minibuffer-local-map (kbd "<left>")
-                                (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
-                    (define-key org-read-date-minibuffer-local-map (kbd "<right>")
-                                (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
-                    (define-key org-read-date-minibuffer-local-map (kbd "<up>")
-                                (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
-                    (define-key org-read-date-minibuffer-local-map (kbd "<down>")
-                                (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1))))))))
+  (advice-add 'org-read-date :before
+              (lambda (&rest _)
+                (when (keymapp org-read-date-minibuffer-local-map)
+                  (define-key org-read-date-minibuffer-local-map (kbd "<left>")
+                              (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
+                  (define-key org-read-date-minibuffer-local-map (kbd "<right>")
+                              (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
+                  (define-key org-read-date-minibuffer-local-map (kbd "<up>")
+                              (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
+                  (define-key org-read-date-minibuffer-local-map (kbd "<down>")
+                              (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1)))))))
 
   ;; Insertion
   (defun +org--insert-item (direction)
@@ -88,10 +88,7 @@
                     (todo-keyword)
                     ('todo)))))))
       (when (org-invisible-p)
-        (org-show-hidden-entry))
-      (when (and (bound-and-true-p meow-mode)
-                 (not (meow-insert-mode-p)))
-        (meow-insert))))
+        (org-show-hidden-entry))))
 
   (defun +org/insert-item-below (count)
     "Insert new heading, table cell or item below current."
@@ -103,18 +100,9 @@
     (interactive "p")
     (dotimes (_ count) (+org--insert-item 'above)))
 
-  (with-eval-after-load 'org
-    (defun +org/smart-return ()
-      "Dwim in normal state, org-return in insert."
-      (interactive)
-      (if (meow-insert-mode-p)
-          (org-return)
-        (+org/dwim-at-point)))
-
-    (define-key org-mode-map (kbd "M-RET")        #'+org/insert-item-below)
-    (define-key org-mode-map (kbd "C-<return>")   #'+org/insert-item-below)
-    (define-key org-mode-map (kbd "C-S-<return>") #'+org/insert-item-above)
-    (define-key org-mode-map (kbd "RET")          #'+org/smart-return)))
+  (define-key org-mode-map (kbd "M-RET")        #'+org/insert-item-below)
+  (define-key org-mode-map (kbd "C-S-<return>") #'+org/insert-item-above)
+  (define-key org-mode-map (kbd "C-<return>")   #'+org/dwim-at-point))
 
 (defun my/org-clock-in-if-starting ()
   "Clock in when task state changes to STRT."
@@ -480,10 +468,7 @@
 
           (`table-cell
            (org-table-blank-field)
-           (org-table-recalculate arg)
-           (when (and (string-empty-p (string-trim (org-table-get-field)))
-                      (bound-and-true-p meow-mode))
-             (meow-insert-mode)))
+           (org-table-recalculate arg))
 
           (`babel-call
            (org-babel-lob-execute-maybe))

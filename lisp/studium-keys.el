@@ -1,9 +1,9 @@
-;;; studium-keys.el --- Description -*- lexical-binding:
+;;; studium-keys.el --- Description -*- lexical-binding: t; -*-
 (keymap-global-set "C->" #'my/indent-right)
 (keymap-global-set "C-<" #'my/indent-left)
-
 (keymap-global-set "C-b"   #'switch-to-buffer)
 (keymap-global-set "C-x C-r" #'eval-region)
+(keymap-global-set "C-x g" #'magit-status)
 (keymap-global-set "C-c M" #'consult-register-store)
 (keymap-global-set "C-c J" #'consult-register)
 (keymap-global-set "C-<left>"  #'windmove-left)
@@ -35,24 +35,21 @@
 (keymap-global-set "C-c n r f" #'org-roam-node-find)
 '("n j" . org-roam-dailies-capture-today)
 ;; Miscellaneous
-(keymap-global-set "!" #'jb/run-command)
 (keymap-global-unset "C-t")
+(keymap-global-set "C-t !" #'jb/run-command)
 (keymap-global-set "C-t t" #'jb/ghostel)
 (keymap-global-set "C-t T" #'jb/ghostel-here)
 (keymap-global-set "C-t o C" #'jb/checks)
 (keymap-global-set "C-t o D" #'jb/download-media)
-
 ;; Lookup
 (keymap-global-set "C-c s T" #'powerthesaurus-lookup-synonyms-dwim)
 (keymap-global-set "C-c s t" #'dictionary-search)
 (keymap-global-set "C-c s o" #'universal-launcher--web-search)
 (keymap-global-set "C-c s l" #'link-hint-open-link)
-
 ;; Open
 (keymap-global-set "C-c o m" #'mu4e)
 (keymap-global-set "C-c o d" #'dirvish)
 (keymap-global-set "C-c y m" #'mu4e-org-mode)
-
 ;; Net
 (keymap-global-set "C-c e r" #'my/erc-connect)
 (keymap-global-set "C-c e w" #'eww)
@@ -60,18 +57,15 @@
 (keymap-global-set "C-c e e" #'elfeed)
 (keymap-global-set "C-c e u" #'elfeed-update)
 (keymap-global-set "C-c e v" #'elfeed-tube-mpv)
-
 ;; Misc
 (keymap-global-set "C-c t z" #'my/zen-mode)
 (keymap-global-set "C-c B"   #'my/scratch-popup)
-
 ;; Workspaces
 (keymap-global-set "C-c w n" #'+workspace/new)
 (keymap-global-set "C-c w d" #'+workspace/delete)
 (keymap-global-set "C-c w r" #'+workspace/rename)
 (keymap-global-set "C-c w w" #'+workspace/switch-to)
 (keymap-global-set "C-c p p" #'+workspace/switch-to-project)
-
 ;; Testing
 (keymap-global-set "C-c m t a" #'my/test-all)
 (keymap-global-set "C-c m t f" #'my/test-file)
@@ -80,7 +74,6 @@
 (keymap-global-set "C-c m t r" #'my/test-rerun)
 (keymap-global-set "C-c m t b" #'my/bench-all)
 (keymap-global-set "C-c m t p" #'my/bench-at-point)
-
 ;; Emms
 (keymap-global-set "C-c m u" #'my/update-emms-from-mpd)
 (keymap-global-set "C-c m d" #'emms-play-directory-tree)
