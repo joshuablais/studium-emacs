@@ -1,29 +1,4 @@
-;;; studium-keys.el --- Description -*- lexical-binding: t; -*-
-
-;; Tab behaviour
-(setq tab-always-indent 'complete)
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
-
-(defun studium--shift (cols)
-  "Shift the current line or all lines touched by the region by COLS."
-  (let ((beg (if (use-region-p)
-                 (save-excursion (goto-char (region-beginning)) (pos-bol))
-               (pos-bol)))
-        (end (if (use-region-p) (region-end) (pos-eol)))
-        (deactivate-mark nil))            ; keep the region for the next press
-    (indent-rigidly beg end cols)))
-
-(defun my/indent-right ()
-  "Indent region or line right."
-  (interactive)
-  (studium--shift tab-width))
-
-(defun my/indent-left ()
-  "Indent region or line left."
-  (interactive)
-  (studium--shift (- tab-width)))
-
+;;; studium-keys.el --- Description -*- lexical-binding:
 (keymap-global-set "C->" #'my/indent-right)
 (keymap-global-set "C-<" #'my/indent-left)
 
@@ -261,6 +236,30 @@
   "o" #'kirigami-open-fold   "O" #'kirigami-open-fold-rec
   "c" #'kirigami-close-fold
   "r" #'kirigami-open-folds  "m" #'kirigami-close-folds)
+
+;; Tab behaviour
+(setq tab-always-indent 'complete)
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
+(defun studium--shift (cols)
+  "Shift the current line or all lines touched by the region by COLS."
+  (let ((beg (if (use-region-p)
+                 (save-excursion (goto-char (region-beginning)) (pos-bol))
+               (pos-bol)))
+        (end (if (use-region-p) (region-end) (pos-eol)))
+        (deactivate-mark nil))            ; keep the region for the next press
+    (indent-rigidly beg end cols)))
+
+(defun my/indent-right ()
+  "Indent region or line right."
+  (interactive)
+  (studium--shift tab-width))
+
+(defun my/indent-left ()
+  "Indent region or line left."
+  (interactive)
+  (studium--shift (- tab-width)))
 
 (keymap-global-set "C-c z" (cons "fold" studium-fold-map))
 
