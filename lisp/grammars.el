@@ -152,22 +152,6 @@
 
 (add-hook 'eglot-managed-mode-hook #'my/eglot-capf)
 
-;; (with-eval-after-load 'meow
-;;   (meow-thing-register 'function
-;;                        '(treesit "function.inner")
-;;                        '(treesit "function.outer"))
-;;   (meow-thing-register 'class
-;;                        '(treesit "class.inner")
-;;                        '(treesit "class.outer"))
-;;   (meow-thing-register 'parameter
-;;                        '(treesit "parameter.inner")
-;;                        '(treesit "parameter.outer"))
-;;   (setq meow-char-thing-table
-;;         (append meow-char-thing-table
-;;                 '((?f . function)
-;;                   (?c . class)
-;;                   (?a . parameter)))))
-
 ;; KIND-ICON
 (use-package kind-icon
   :ensure t

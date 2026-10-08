@@ -8,13 +8,6 @@
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak-dh)
 
   (meow-leader-define-key
-   '("?" . meow-cheatsheet)
-
-   ;; Files and Consult
-   '("/" . consult-ripgrep)
-   '("f r" . consult-recent-file)
-   '("f y" . my/yank-buffer-path)
-
    ;; Projects
    '("SPC" . project-find-file)
    '("p R" . project-query-replace-regexp)
@@ -206,6 +199,11 @@
 (keymap-global-set "C-x k" #'kill-current-buffer)
 (keymap-global-set "C--" #'text-scale-decrease)
 (keymap-global-set "C-=" #'text-scale-increase)
+(keymap-global-set "C-f" #'find-file)
+;; Files and Consult
+(keymap-global-set "C-c /" #'consult-ripgrep)
+(keymap-global-set "C-c f r" #'consult-recent-file)
+(keymap-global-set "C-c f y" #'my/yank-buffer-path)
 
 ;; File path yanking
 (defun my/yank-buffer-path (&optional root)
