@@ -5,6 +5,15 @@
 (setq org-log-done 'time)
 
 (with-eval-after-load 'org
+  (defun +org/smart-return ()
+    "DWIM on a checkbox or TODO keyword; otherwise a normal `org-return'."
+    (interactive)
+    (if (or (org-in-regexp "\\[[ X-]\\]")
+            (and (org-at-heading-p) (org-in-regexp org-todo-regexp)))
+        (+org/dwim-at-point)
+      (org-return)))
+
+  (define-key org-mode-map (kbd "RET") #'+org/smart-return)
   (setq org-modules                     '(org-habit)
         org-edit-src-content-indentation 0
         org-hide-leading-stars           t
