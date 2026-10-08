@@ -142,7 +142,6 @@
 (elpaca-wait)
 
 ;; UI
-(set-fringe-mode 10)
 (add-to-list 'custom-theme-load-path
              (expand-file-name "themes/" user-emacs-directory))
 
@@ -226,7 +225,7 @@
 (require 'magit-config)
 (require 'mail)
 (require 'move-text-config)
-(require 'flash-config)
+;; (require 'flash-config)
 (require 'pass-config)
 (require 'org-caldav-config)
 ;; (require 'markdown)
@@ -245,7 +244,6 @@
 (require 'persist)
 (require 'dired-config)
 (require 'jabber-config)
-(require 'vterm-config)
 (require 'ghostel-config)
 (require 'elfeed-config)
 (require 'reading)

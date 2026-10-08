@@ -8,20 +8,6 @@
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak-dh)
 
   (meow-leader-define-key
-   ;; Projects
-   '("SPC" . project-find-file)
-   '("p R" . project-query-replace-regexp)
-
-   ;; Buffer
-   '("b S" . my/save-all-buffers)
-
-   ;; Bookmarks
-   '("b m" . bookmark-set)
-   '("b P" . bookmark-save)
-   '("b D" . bookmark-delete)
-   '("RET" . bookmark-jump)
-   '("o b" . browse-url-of-file)
-
    ;; Org
    '("C" . org-capture)
    '("n r i" . org-roam-capture)
@@ -55,13 +41,10 @@
    '("<TAB> l" . easysession-switch-to)
    '("<TAB> R" . easysession-rename)
    '("<TAB> D" . easysession-delete)
-   ;; '("<TAB> <TAB>" . +workspace/display)
    '("<TAB> n" . +workspace/new)
    '("<TAB> d" . +workspace/delete)
    '("<TAB> r" . +workspace/rename)
    '("<TAB> <TAB>" . +workspace/switch-to)
-   ;; '("<TAB> [" . tab-bar-switch-to-prev-tab)
-   ;; '("<TAB> ]" . tab-bar-switch-to-next-tab)
    '("p p" . +workspace/switch-to-project)
 
    ;; Testing
@@ -204,6 +187,18 @@
 (keymap-global-set "C-c /" #'consult-ripgrep)
 (keymap-global-set "C-c f r" #'consult-recent-file)
 (keymap-global-set "C-c f y" #'my/yank-buffer-path)
+;; Projects
+(keymap-global-set "C-c SPC" #'project-find-file)
+(keymap-global-set "C-c p R" #'project-query-replace-regexp)
+;; Buffer
+(keymap-global-set "C-c b S" #'my/save-all-buffers)
+;; Bookmarks
+(keymap-global-set "C-c b m" #'bookmark-set)
+(keymap-global-set "C-c b P" #'bookmark-save)
+(keymap-global-set "C-c b D" #'bookmark-delete)
+(keymap-global-set "C-c RET" #'bookmark-jump)
+(keymap-global-set "C-c o b" #'browse-url-of-file)
+
 
 ;; File path yanking
 (defun my/yank-buffer-path (&optional root)
