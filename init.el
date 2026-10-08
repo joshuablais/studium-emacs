@@ -5,6 +5,7 @@
       user-mail-address "josh@joshblais.com")
 (setq auth-sources '("~/.authinfo.gpg")
       auth-source-cache-expiry nil)
+(auth-source-pass-enable)
 
 ;; Elpaca bootstrap
 (defvar elpaca-installer-version 0.12)
