@@ -27,7 +27,7 @@
 (keymap-global-set "C-c b m" #'bookmark-set)
 (keymap-global-set "C-c b P" #'bookmark-save)
 (keymap-global-set "C-c b D" #'bookmark-delete)
-(keymap-global-set "C-c RET" #'bookmark-jump)
+(keymap-global-set "M-j" #'bookmark-jump)
 (keymap-global-set "C-c o b" #'browse-url-of-file)
 ;; Org
 (keymap-global-set "C-c c" #'org-capture)
