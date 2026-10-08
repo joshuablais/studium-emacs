@@ -1,7 +1,7 @@
 ;;; studium-keys.el --- Description -*- lexical-binding: t; -*-
 (keymap-global-set "C->" #'my/indent-right)
 (keymap-global-set "C-<" #'my/indent-left)
-(keymap-global-set "C-b"   #'switch-to-buffer)
+(keymap-global-set "C-b" #'consult-buffer)
 (keymap-global-set "C-x C-r" #'eval-region)
 (keymap-global-set "C-x g" #'magit-status)
 (keymap-global-set "C-c M" #'consult-register-store)
@@ -101,7 +101,7 @@
 (defun my/yank-buffer-path (&optional root)
   "Copy current buffer's file path to kill ring."
   (interactive)
-  (let ((filename (or (and (ignerived-mode-p 'dired-mode)
+  (let ((filename (or (and (derived-mode-p 'dired-mode)
                            (dired-get-file-for-visit))
                       (buffer-file-name))))
     (if filename
@@ -254,5 +254,10 @@
   "Indent region or line left."
   (interactive)
   (studium--shift (- tab-width)))
+
+(defun my/save-all-buffers ()
+  "Save all modified buffers without prompting."
+  (interactive)
+  (save-some-buffers t))
 
 (provide 'studium-keys)

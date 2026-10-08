@@ -16,9 +16,9 @@
 
   ;; Misc
   (define-key org-mode-map (kbd "C-c C-i") #'my/org-insert-image)
-  (define-key org-mode-map (kbd "C-c E")   #'org-set-effort)
-  (define-key org-mode-map (kbd "C-c I")   #'org-clock-in)
-  (define-key org-mode-map (kbd "C-c O")   #'org-clock-out)
+  (define-key org-mode-map (kbd "C-c e")   #'org-set-effort)
+  (define-key org-mode-map (kbd "C-c i")   #'org-clock-in)
+  (define-key org-mode-map (kbd "C-c o")   #'org-clock-out)
 
   ;; Calendar date navigation
   (advice-add 'org-read-date :before
