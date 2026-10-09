@@ -237,7 +237,7 @@
 (require 'jb-guix)
 (require 'modeline)
 (require 'editing)
-;; (require 'tabs)
+(require 'tabs)
 ;; (require 'llms)
 (require 'completion)
 (require 'test-runner)
