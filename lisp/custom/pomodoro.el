@@ -86,9 +86,9 @@
 
 ;;; Mode Line Setup
 
-(unless (member 'pomodoro--mode-line global-mode-string)
-  (setq global-mode-string
-        (append global-mode-string '(pomodoro--mode-line))))
+(unless global-mode-string
+  (setq global-mode-string '("")))
+(add-to-list 'global-mode-string 'pomodoro--mode-line t)
 
 ;;; Core Functions
 (defvar pomodoro--sound-process nil
