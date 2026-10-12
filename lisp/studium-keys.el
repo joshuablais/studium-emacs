@@ -3,6 +3,7 @@
 (keymap-global-set "C-<" #'my/indent-left)
 (keymap-global-set "C-b" #'consult-buffer)
 (keymap-global-set "C-x C-r" #'eval-region)
+(keymap-global-set "C-x C-b" #'ibuffer)
 (keymap-global-set "C-x g" #'magit-status)
 (keymap-global-set "C-c M" #'consult-register-store)
 (keymap-global-set "C-c J" #'consult-register)
