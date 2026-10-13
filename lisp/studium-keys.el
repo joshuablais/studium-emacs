@@ -261,4 +261,20 @@
   (interactive)
   (save-some-buffers t))
 
+(defun studium/mark-line (n)
+  "Select the current line; invoke again to extend by N lines."
+  (interactive "p")
+  (if (use-region-p)
+      (forward-line n)
+    (forward-line 0)
+    (push-mark (point) t t)
+    (forward-line n)))
+
+(defvar-keymap studium/mark-line-repeat-map
+  :repeat t
+  "l" #'studium/mark-line)
+
+(repeat-mode 1)
+(keymap-global-set "C-l" #'studium/mark-line)
+
 (provide 'studium-keys)
