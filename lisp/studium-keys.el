@@ -62,11 +62,11 @@
 (keymap-global-set "C-c t z" #'my/zen-mode)
 (keymap-global-set "C-c B"   #'my/scratch-popup)
 ;; Workspaces
-(keymap-global-set "C-c w n" #'+workspace/new)
-(keymap-global-set "C-c w d" #'+workspace/delete)
-(keymap-global-set "C-c w r" #'+workspace/rename)
-(keymap-global-set "C-c w w" #'+workspace/switch-to)
-(keymap-global-set "C-c p p" #'+workspace/switch-to-project)
+(keymap-global-set "C-S-w n" #'+workspace/new)
+(keymap-global-set "C-S-w d" #'+workspace/delete)
+(keymap-global-set "C-S-w r" #'+workspace/rename)
+(keymap-global-set "C-S-w w" #'+workspace/switch-to)
+(keymap-global-set "C-S-w p" #'+workspace/switch-to-project)
 ;; Testing
 (keymap-global-set "C-c m t a" #'my/test-all)
 (keymap-global-set "C-c m t f" #'my/test-file)
