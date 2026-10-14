@@ -20,7 +20,9 @@
 (keymap-global-set "C-c f r" #'consult-recent-file)
 (keymap-global-set "C-c f y" #'my/yank-buffer-path)
 ;; Projects
-(keymap-global-set "C-c SPC" #'project-find-file)
+(with-eval-after-load 'flyspell
+  (keymap-unset flyspell-mode-map "C-," t))
+(keymap-global-set "C-," #'project-find-file)
 (keymap-global-set "C-c p R" #'project-query-replace-regexp)
 ;; Buffer
 (keymap-global-set "C-c b S" #'my/save-all-buffers)
