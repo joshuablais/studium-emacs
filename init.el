@@ -50,6 +50,8 @@
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
 
+(use-package transient  :ensure t)
+(use-package nerd-icons :ensure t)
 (elpaca-wait)
 
 (setq use-package-always-defer t

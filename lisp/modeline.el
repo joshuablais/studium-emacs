@@ -3,7 +3,7 @@
 (defvar nerd-icons-font-family)   ; defined by nerd-icons; declared here for the compiler
 (setq nerd-icons-font-family "GeistMono Nerd Font")
 
-(use-package nerd-icons :demand t)
+;; (use-package nerd-icons :demand t)
 
 ;;;; Helpers
 

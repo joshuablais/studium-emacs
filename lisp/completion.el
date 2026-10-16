@@ -13,7 +13,7 @@
   :init
   (marginalia-mode 1))
 
-(elpaca-wait)
+;; (elpaca-wait)
 
 (use-package orderless
   :ensure t
@@ -44,7 +44,8 @@
   :ensure t
   :bind
   (("C-." . embark-act)
-   ("C-;" . embark-dwim)))
+   ;; ("C-;" . embark-dwim)
+   ))
 
 (use-package embark-consult
   :ensure t

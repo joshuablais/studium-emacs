@@ -1,17 +1,11 @@
-;;; magit.el --- Description -*- lexical-binding: t; -*-
-
-(use-package transient :ensure t :demand t)
-(elpaca-wait)
-
-(use-package magit-section :ensure t :demand t)
-(elpaca-wait)
+;;; magit-config.el --- Magit and Forge -*- lexical-binding: t; -*-
 
 (use-package magit
   :ensure t
-  :defer t
   :config
   (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
-        magit-bury-buffer-function #'magit-restore-window-configuration))
+        magit-bury-buffer-function #'magit-restore-window-configuration)
+  (keymap-set magit-status-mode-map "p" #'magit-push))
 
 (use-package forge
   :ensure t
@@ -20,11 +14,8 @@
   :init
   (setq forge-add-default-bindings t)
   :config
-  (dolist (entry '(("forge.labrynth.org" "forge.labrynth.org/api/v1" "forge.labrynth.org" forge-forgejo-repository)))
-    (add-to-list 'forge-alist entry)))
-(elpaca-wait)
-
-(with-eval-after-load 'magit
-  (define-key magit-status-mode-map (kbd "p") #'magit-push))
+  (add-to-list 'forge-alist
+               '("forge.labrynth.org" "forge.labrynth.org/api/v1"
+                 "forge.labrynth.org" forge-forgejo-repository)))
 
 (provide 'magit-config)
