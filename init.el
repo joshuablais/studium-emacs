@@ -283,9 +283,8 @@
 (require 'tramp-config)
 (require 'gnus-config)
 (require 'tools)
-(with-eval-after-load 'org
-  (require 'org-config)
-  (require 'org-roam-config))
+(require 'org-config)
+(require 'org-roam-config)
 (require 'agenda-custom)
 ;; Custom
 (require 'jitsi-meeting)

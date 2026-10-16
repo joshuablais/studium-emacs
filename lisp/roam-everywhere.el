@@ -58,7 +58,7 @@ text from a previous capture being reused.")
   "Org-roam daily capture from anywhere; on finalize, inject the body
 into the window that was focused when the capture was triggered."
   (interactive)
-  (require 'org-roam)
+  (require 'org-roam-dailies)
   (jb/roam--reset-state)
   (setq jb/roam--armed t
         jb/roam--return-conid (jb/roam--origin-conid))

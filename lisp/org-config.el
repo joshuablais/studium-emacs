@@ -1,8 +1,12 @@
 ;;; org-mode-config.el --- Description -*- lexical-binding: t; -*-
 
-(setq org-directory "~/org")
-(setq org-clock-out-when-done nil)
-(setq org-log-done 'time)
+(setq org-directory "~/org"
+      org-modules '(org-habit)
+      org-clock-out-when-done nil
+      org-log-done 'time
+      org-edit-src-content-indentation 0
+      org-hide-leading-stars t
+      org-return-follows-link t)
 
 (with-eval-after-load 'org
   (defun +org/smart-return ()
@@ -14,10 +18,6 @@
       (org-return)))
 
   (define-key org-mode-map (kbd "RET") #'+org/smart-return)
-  (setq org-modules                     '(org-habit)
-        org-edit-src-content-indentation 0
-        org-hide-leading-stars           t
-        org-return-follows-link          t)
 
   ;; Heading navigation
   (define-key org-mode-map (kbd "<M-left>")  #'org-do-promote)
@@ -30,17 +30,16 @@
   (define-key org-mode-map (kbd "C-c o")   #'org-clock-out)
 
   ;; Calendar date navigation
-  (advice-add 'org-read-date :before
-              (lambda (&rest _)
-                (when (keymapp org-read-date-minibuffer-local-map)
-                  (define-key org-read-date-minibuffer-local-map (kbd "<left>")
-                              (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
-                  (define-key org-read-date-minibuffer-local-map (kbd "<right>")
-                              (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
-                  (define-key org-read-date-minibuffer-local-map (kbd "<up>")
-                              (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
-                  (define-key org-read-date-minibuffer-local-map (kbd "<down>")
-                              (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1)))))))
+  ;; Calendar date navigation
+  (let ((map org-read-date-minibuffer-local-map))
+    (keymap-set map "<left>"
+                (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
+    (keymap-set map "<right>"
+                (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
+    (keymap-set map "<up>"
+                (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
+    (keymap-set map "<down>"
+                (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1)))))
 
   ;; Insertion
   (defun +org--insert-item (direction)
@@ -283,16 +282,16 @@
 
 (defvar jb/--crm-marker nil "Marker for CRM contact update.")
 
-(setq display-buffer-alist
-      `(("\\*Capture\\*\\|CAPTURE-.*"
-         (display-buffer-reuse-window display-buffer-at-bottom)
-         (window-height . 0.3))
-        ("\\*Calendar\\*"
-         (display-buffer-reuse-window display-buffer-at-bottom)
-         (window-height . 0.3))
-        ("\\*Org Agenda\\*"
-         (display-buffer-reuse-window display-buffer-at-bottom)
-         (window-height . 0.4))))
+(dolist (rule '(("\\*Capture\\*\\|CAPTURE-.*"
+                 (display-buffer-reuse-window display-buffer-at-bottom)
+                 (window-height . 0.3))
+                ("\\*Calendar\\*"
+                 (display-buffer-reuse-window display-buffer-at-bottom)
+                 (window-height . 0.3))
+                ("\\*Org Agenda\\*"
+                 (display-buffer-reuse-window display-buffer-at-bottom)
+                 (window-height . 0.4))))
+  (add-to-list 'display-buffer-alist rule))
 
 ;; Contacts
 (defvar my/contacts-file "~/org/contacts.org")
@@ -380,8 +379,7 @@
 
 (with-eval-after-load 'org
   (setq org-startup-folded 'showeverything
-        org-cycle-emulate-tab t
-        org-indent-mode t)
+        org-cycle-emulate-tab t)
   (add-hook 'org-mode-hook #'org-indent-mode))
 
 (with-eval-after-load 'org
@@ -516,10 +514,9 @@
               (org-element-property :begin context)
               (org-element-property :end context)))))))))
 
-(use-package ob-go :demand t)
+(use-package ob-go :ensure t)
 (use-package ob-zig
-  :ensure (ob-zig :host github :repo "jolby/ob-zig.el")
-  :after org)
+  :ensure (ob-zig :host github :repo "jolby/ob-zig.el"))
 
 ;; Refile to org-agenda nodes
 (setq org-refile-targets
@@ -527,26 +524,30 @@
 (setq org-refile-use-outline-path 'file
       org-outline-path-complete-in-steps nil)
 
-(elpaca-wait)
+;;; Babel: load each language the first time one of its blocks executes
+(setq org-src-fontify-natively t)
 
-;; set babel languages, add go
-(with-eval-after-load 'org
-  (setq org-src-fontify-natively t)
-  (add-to-list 'org-src-lang-modes '("go" . go-ts))
-  (require 'ob-shell)
-  (require 'ob-python)
-  (require 'ob-C)
-  (require 'ob-go)
-  (require 'ob-zig)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((shell      . t)
-     (emacs-lisp . t)
-     (python     . t)
-     (C          . t)
-     (zig        . t)
-     (scheme     . t)
-     (go         . t))))
+(defvar studium-babel-lang-features
+  '(("C" . C) ("cpp" . C) ("C++" . C) ("D" . C)
+    ("sh" . shell) ("bash" . shell) ("zsh" . shell)
+    ("elisp" . emacs-lisp))
+  "Block languages whose ob- library has a different name.")
+
+(defun studium--babel-load-lang (&optional _arg info &rest _)
+  "Require the ob- library for the src block about to execute."
+  (let* ((lang (car (or info (org-babel-get-src-block-info t))))
+         (feat (intern (format "ob-%s"
+                               (or (cdr (assoc lang studium-babel-lang-features))
+                                   lang)))))
+    (unless (or (fboundp (intern (concat "org-babel-execute:" lang)))
+                (not (locate-library (symbol-name feat))))
+      (require feat))))
+
+(with-eval-after-load 'ob-core
+  (advice-add 'org-babel-execute-src-block :before #'studium--babel-load-lang))
+
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("go" . go-ts)))
 
 ;;; --- LSP in org-src buffers -------------------------------------------
 ;; Eglot refuses to manage buffers with no `buffer-file-name' — every LSP
