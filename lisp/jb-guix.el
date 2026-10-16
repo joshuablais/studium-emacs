@@ -1,21 +1,20 @@
 ;;; jb-guix.el -*- lexical-binding: t; -*-
+
 (use-package geiser
   :ensure nil
-  :demand t)
+  :init
+  (setq geiser-active-implementations '(guile)
+        geiser-mode-start-repl-p t))
 
 (use-package geiser-guile
   :ensure nil
-  :demand t
-  :config
+  :init
   (setq geiser-guile-binary (or (executable-find "guile")
-                                "/home/joshua/.guix-profile/bin/guile")
-        geiser-guile-case-sensitive-p t
-        geiser-active-implementations '(guile)))
+                                (expand-file-name "~/.guix-profile/bin/guile"))
+        geiser-guile-case-sensitive-p t))
 
 (use-package guix
   :ensure nil
-  :commands (guix guix-installed-user-packages guix-packages-by-name)
-  :init
-  (require 'guix nil t))
+  :commands (guix guix-installed-user-packages guix-packages-by-name))
 
 (provide 'jb-guix)

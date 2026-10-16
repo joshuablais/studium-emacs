@@ -61,28 +61,25 @@
   :mode "[Jj]ustfile\\'")
 
 ;; YASNIPPET
-;; No :defer — yas-global-mode must be live before the first eglot buffer
-;; opens or yasnippet-capf serves nothing on first completion attempt.
 (use-package yasnippet
   :ensure t
-  :demand t
-  :config
+  :hook ((prog-mode text-mode) . yas-minor-mode)
+  :init
+  ;; :init, not :config. yasnippet-snippets appends its own dir after
+  ;; yasnippet loads; a setq in :config could run after that and wipe it.
   (setq yas-snippet-dirs '("~/.config/emacs/snippets")
-        yas-verbosity    0)
-  (yas-global-mode 1))
+        yas-verbosity 0)
+  :config
+  (yas-reload-all))
 
 (use-package yasnippet-snippets
   :ensure t
-  :demand t
   :after yasnippet)
 
 (use-package yasnippet-capf
   :ensure t
-  :demand t
   :custom
   (yasnippet-capf-lookup-by 'key))
-
-(elpaca-wait)
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -107,20 +104,21 @@
          (c-ts-mode      . eglot-ensure)
          (nix-ts-mode    . eglot-ensure)
          (just-ts-mode    . eglot-ensure)
-         (scheme-mode    . eglot-ensure)
+         ;; (scheme-mode    . eglot-ensure)
          (templ-ts-mode  . eglot-ensure)
          (terraform-ts-mode . eglot-ensure)
          (zig-mode       . eglot-ensure))
   :custom
-  (eglot-autoshutdown       t)
-  (eglot-events-buffer-size 0)
-  (eglot-sync-connect       nil)
-  (eglot-extend-to-xref     t)
+  (eglot-autoshutdown t)
+  (eglot-events-buffer-config '(:size 0 :format short))
+  (eglot-sync-connect nil)
+  (eglot-extend-to-xref t)
   :config
   (add-to-list 'eglot-server-programs
                '(templ-ts-mode . ("templ" "lsp")))
-  (add-to-list 'eglot-server-programs
-               '(scheme-mode . ("guile-lsp-server"))))
+  ;; (add-to-list 'eglot-server-programs
+  ;;              '(scheme-mode . ("guile-lsp-server")))
+  )
 
 ;; ELDOC BOX
 (use-package eldoc-box

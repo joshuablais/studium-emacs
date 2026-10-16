@@ -82,12 +82,12 @@
   (load custom-file))
 
 ;; GC
-(use-package gcmh
-  :defer 1
-  :config
-  (setq gcmh-idle-delay 5
-        gcmh-high-cons-threshold (* 16 1024 1024))
-  (gcmh-mode 1))
+;; (use-package gcmh
+;;   :defer 1
+;;   :config
+;;   (setq gcmh-idle-delay 5
+;;         gcmh-high-cons-threshold (* 16 1024 1024))
+;;   (gcmh-mode 1))
 
 ;; Sane defaults
 (setq-default
@@ -190,6 +190,7 @@
   (pinentry-start))
 
 (use-package which-key
+  :ensure nil
   :demand t
   :config
   (setq which-key-idle-delay 0.1)
@@ -217,6 +218,28 @@
 
 (advice-add 'treesit-ready-p :before #'jb/treesit-ensure-direnv-path)
 
+;; TESTING
+(defvar studium--require-times nil)
+
+(define-advice require (:around (fn feature &rest args) studium-time)
+  (if (featurep feature)
+      (apply fn feature args)
+    (let ((t0 (current-time)))
+      (prog1 (apply fn feature args)
+        (push (cons feature (float-time (time-since t0)))
+              studium--require-times)))))
+
+(defun studium-require-report ()
+  (interactive)
+  (advice-remove 'require #'require@studium-time)
+  (with-current-buffer (get-buffer-create "*require-times*")
+    (erase-buffer)
+    (dolist (e (seq-take (sort studium--require-times
+                               (lambda (a b) (> (cdr a) (cdr b))))
+                         30))
+      (insert (format "%8.1f ms  %s\n" (* 1000 (cdr e)) (car e))))
+    (display-buffer (current-buffer))))
+
 ;; Modules
 (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lisp/custom/" user-emacs-directory))
@@ -241,7 +264,7 @@
 ;; (require 'llms)
 (require 'completion)
 (require 'test-runner)
-(require 'persist)
+;; (require 'persist)
 (require 'dired-config)
 (require 'jabber-config)
 (require 'ghostel-config)
@@ -253,7 +276,7 @@
 (require 'writing)
 (require 'spelling)
 (require 'workspaces)
-(require 'roam-everywhere)
+;; (require 'roam-everywhere)
 (require 'elpher-config)
 (require 'tramp-config)
 (require 'gnus-config)
@@ -268,11 +291,28 @@
 (require 'universal-launcher)
 (require 'jb-0x0)
 (require 'jb-clipboard-manager)
-(require 'pomodoro)
+;; (require 'pomodoro)
 (require 'crm-config)
 (require 'posse-social)
-(require 'post-to-blog)
 (require 'done-refile)
 (require 'create-daily)
 (require 'nm)
+
+(use-package post-to-blog
+  :ensure nil
+  :commands (publish-post-to-astro))
+
+(use-package roam-everywhere
+  :ensure nil                       ; local file: don't let Elpaca fetch it
+  :commands (jb/roam-capture-everywhere))
+
+(use-package pomodoro
+  :ensure nil
+  :commands (pomodoro-start pomodoro-stop)
+  :bind (("C-c P"   . pomodoro-toggle)
+         ("C-c p g" . pomodoro-goto)
+         ("C-c p d" . pomodoro-task-done)
+         ("C-c p s" . pomodoro-status)
+         ("C-c p p" . pomodoro-pause-toggle)))
+
 (put 'narrow-to-region 'disabled nil)
