@@ -83,6 +83,8 @@
 (keymap-global-set "C-c m p" #'emms-playlist-mode-go)
 (keymap-global-set "C-c m h" #'emms-shuffle)
 (keymap-global-set "C-c m o" #'emms-browser)
+(with-eval-after-load 'org
+  (keymap-unset org-mode-map "C-'" t))
 (keymap-global-set "C-'" #'repeat)
 
 (defun studium/find-config ()
