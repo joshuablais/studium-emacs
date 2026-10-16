@@ -11,10 +11,11 @@
 ;;; Backend: bufferlo for real isolation
 (use-package bufferlo
   :ensure t
-  :demand t
-  :config
-  (bufferlo-mode 1)
-  (bufferlo-anywhere-mode 1))
+  :init
+  (run-with-idle-timer 0.5 nil
+                       (lambda ()
+                         (bufferlo-mode 1)
+                         (bufferlo-anywhere-mode 1))))
 
 ;;; Helpers
 (defun +workspace--current-name ()
