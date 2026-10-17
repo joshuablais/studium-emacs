@@ -122,7 +122,7 @@
   (keymap-unset undo-tree-map "C-/" t))
 (keymap-global-set "C-/" #'consult-line)
 (keymap-global-set "C-S-u" #'undo-only)
-(keymap-global-set "C-S-r" #'undo-tree-redo)
+(keymap-global-set "C-S-r" #'undo-redo)
 
 ;; Replace meow-inner/outer
 (defconst studium--pairs '((?\( . ?\)) (?\[ . ?\]) (?\{ . ?\}) (?< . ?>)))
