@@ -1,582 +1,497 @@
-;;; universal-launcher.el --- one-line description  -*- lexical-binding: t; -*-
-;;; universal-launcher.el --- Optimized universal launcher
+;;; universal-launcher.el --- Minibuffer launcher  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; Simplified version that uses the existing Emacs frame
+;; Sources are (GROUP FETCH KEY).  FETCH returns candidate strings carrying
+;; `ul-type' and `ul-payload' text properties.  KEY, when non-nil, returns a
+;; cheap fingerprint of FETCH's inputs; FETCH reruns only when it changes.
+;; KEY nil means FETCH runs every popup (only for cheap, volatile sources).
+;; No timers.  Icons are computed only for rows Vertico actually displays.
 
 ;;; Code:
+
+(require 'cl-lib)
+(require 'subr-x)
 (require 'recentf)
-(recentf-mode 1)
 (require 'nerd-icons)
-(require 'json)
-(require 'url-util)
-(require 'calc)
+(recentf-mode 1)
 
-;; Pre-grouped category structure for aesthetic grouping
-(defvar universal-launcher--categories
-  '((:name "Context" :icon "flash" :types (contextual custom-action))
-    (:name "Active" :icon "device-desktop" :types (buffer running))
-    (:name "Tasks" :icon "checklist" :types (agenda-task))
-    (:name "Files & Apps" :icon "apps" :types (file app flatpak nix))
-    (:name "Web" :icon "globe" :types (bookmark firefox-action))
-    (:name "System" :icon "terminal" :types (command ssh))
-    (:name "Tools" :icon "wrench" :types (emoji calculator kill-ring-item)))
-  "Category definitions for the launcher.")
+(autoload 'url-hexify-string "url-util")
+(defvar org-agenda-files)
+(declare-function org-agenda-files "org")
+(declare-function org-map-entries "org")
+(declare-function org-get-heading "org")
+(declare-function org-get-todo-state "org")
+(declare-function org-fold-show-context "org-fold")
 
-;; Enhanced cache system
-(defvar universal-launcher--all-candidates nil "Pre-computed candidates.")
-(defvar universal-launcher--last-update 0 "Last time candidates were updated.")
-(defvar universal-launcher--update-interval 20 "Update interval in seconds.")
-(defvar universal-launcher--previous-frame nil "The previous frame to return to.")
+(defgroup universal-launcher nil "Minibuffer launcher." :group 'convenience)
 
-;; Emoji data
+;;;; Sources
+
+(defvar universal-launcher-sources
+  '(("Context"      universal-launcher--actions)
+    ("Active"       universal-launcher--buffers)
+    ("Active"       universal-launcher--windows)
+    ("Tasks"        universal-launcher--tasks     universal-launcher--tasks-key)
+    ("Files & Apps" universal-launcher--files     universal-launcher--files-key)
+    ("Files & Apps" universal-launcher--apps      universal-launcher--apps-key)
+    ("Web"          universal-launcher--bookmarks universal-launcher--bookmarks-key)
+    ("System"       universal-launcher--ssh-hosts universal-launcher--ssh-key)
+    ("System"       universal-launcher--commands  universal-launcher--commands-key)
+    ("Tools"        universal-launcher--kill-ring)
+    ("Tools"        universal-launcher--emojis    ignore))
+  "List of (GROUP FETCH KEY).  `ignore' as KEY means compute once.")
+
+(defcustom universal-launcher-bookmarks-file "~/org/bookmarks.org"
+  "Org file scanned for URLs." :type 'file)
+
+(defcustom universal-launcher-mode-actions
+  '((t nil "Capture" ("Quick note" . org-capture))
+    (org-mode nil "Org"
+     ("Open Agenda" . org-agenda) ("Refile" . org-refile)
+     ("Archive subtree" . org-archive-subtree) ("Set tags" . org-set-tags-command))
+    ((go-mode go-ts-mode) "go.mod" "Go"
+     ("Run tests" . "go test -v ./...") ("Build" . "go build")
+     ("Run main" . "go run .") ("Tidy modules" . "go mod tidy") ("Format code" . gofmt))
+    ((rust-mode rust-ts-mode) "Cargo.toml" "Rust"
+     ("Build" . "cargo build") ("Run tests" . "cargo test")
+     ("Run" . "cargo run") ("Check" . "cargo check"))
+    (emacs-lisp-mode nil "Elisp"
+     ("Eval buffer" . eval-buffer) ("Eval defun" . eval-defun) ("Load file" . load-file))
+    ((nix-mode nix-ts-mode) nil "Nix"
+     ("Rebuild switch" . "sudo nixos-rebuild switch")
+     ("Rebuild test" . "sudo nixos-rebuild test")
+     ("Update flake" . "nix flake update"))
+    ((markdown-mode gfm-mode) nil "Markdown"
+     ("Preview" . markdown-preview) ("Export to HTML" . markdown-export)))
+  "Entries (MODES ROOT-FILE LABEL . ACTIONS).
+MODES is t, a mode, or a list of modes; derived modes match.  ROOT-FILE,
+when non-nil, is located upward to set `default-directory'.  Each action
+is (NAME . COMMAND) or (NAME . SHELL-STRING).  Unbound commands are hidden."
+  :type 'sexp)
+
+(defcustom universal-launcher-custom-actions nil
+  "Global actions: (NAME . COMMAND), (NAME . SHELL-STRING),
+or the old form (NAME . (TYPE . ACTION))."
+  :type 'sexp)
+
 (defvar universal-launcher--common-emojis
-  '(("Smiling Face" . "😊")
-    ("Heart" . "❤️")
-    ("Thumbs Up" . "👍")
-    ("Thinking Face" . "🤔")
-    ("Fire" . "🔥")
-    ("Star" . "⭐")
-    ("Check Mark" . "✅")
-    ("Rocket" . "🚀")
-    ("Party Popper" . "🎉")
-    ("Eyes" . "👀")
-    ("Laughing Face" . "😂")
-    ("Clapping Hands" . "👏")
-    ("Folded Hands" . "🙏")
-    ("Muscle" . "💪")
-    ("Sparkles" . "✨")
-    ("Warning" . "⚠️")
-    ("Information" . "ℹ️")
-    ("Question Mark" . "❓")
-    ("Prohibited" . "🚫")
-    ("Calendar" . "📅")
-    ("Clock" . "⏰")
-    ("Mail" . "📧")
-    ("Lock" . "🔒")
-    ("Magnifying Glass" . "🔍")
-    ("Light Bulb" . "💡"))
-  "Common emojis for quick access.")
+  '(("Smiling Face" . "😊") ("Heart" . "❤️") ("Thumbs Up" . "👍")
+    ("Thinking Face" . "🤔") ("Fire" . "🔥") ("Star" . "⭐")
+    ("Check Mark" . "✅") ("Rocket" . "🚀") ("Party Popper" . "🎉")
+    ("Eyes" . "👀") ("Laughing Face" . "😂") ("Clapping Hands" . "👏")
+    ("Folded Hands" . "🙏") ("Muscle" . "💪") ("Sparkles" . "✨")
+    ("Warning" . "⚠️") ("Information" . "ℹ️") ("Question Mark" . "❓")
+    ("Prohibited" . "🚫") ("Calendar" . "📅") ("Clock" . "⏰")
+    ("Mail" . "📧") ("Lock" . "🔒") ("Magnifying Glass" . "🔍")
+    ("Light Bulb" . "💡")))
 
-;; Icon cache with category-specific icons
-(defvar universal-launcher--icon-cache
-  (let ((cache (make-hash-table :test 'equal)))
-    (puthash 'buffer     (nerd-icons-octicon "nf-oct-file_code"      :face '(:foreground "#3d424a"  :height 0.9)) cache)
-    (puthash 'running    (nerd-icons-mdicon  "nf-md-monitor"          :face '(:foreground "#8b919a"  :height 0.9)) cache)
-    (puthash 'app        (nerd-icons-faicon  "nf-fa-cube"             :face '(:foreground "#e0dcd4"  :height 0.9)) cache)
-    (puthash 'flatpak    (nerd-icons-mdicon  "nf-md-layers"           :face '(:foreground "#56b6c2"  :height 0.9)) cache)
-    (puthash 'nix        (nerd-icons-mdicon  "nf-md-nix"              :face '(:foreground "#7ebae4"  :height 0.9)) cache)
-    (puthash 'firefox    (nerd-icons-faicon  "nf-fa-firefox"          :face '(:foreground "#e06c75"  :height 0.9)) cache)
-    (puthash 'bookmark   (nerd-icons-octicon "nf-oct-bookmark"        :face '(:foreground "#b8c4b8"  :height 0.9)) cache)
-    (puthash 'file       (nerd-icons-faicon  "nf-fa-file"             :face '(:foreground "#d4ccb4"  :height 0.9)) cache)
-    (puthash 'command    (nerd-icons-octicon "nf-oct-terminal"        :face '(:foreground "#98c379"  :height 0.9)) cache)
-    (puthash 'emoji      (nerd-icons-mdicon  "nf-md-emoticon"         :face '(:foreground "#e5c07b"  :height 0.9)) cache)
-    (puthash 'calculator (nerd-icons-faicon  "nf-fa-calculator"       :face '(:foreground "#56b6c2"  :height 0.9)) cache)
-    (puthash "Active"    (nerd-icons-mdicon  "nf-md-view_dashboard"   :face '(:foreground "#61afef"  :weight bold :height 1.0)) cache)
-    (puthash "Files & Apps" (nerd-icons-mdicon "nf-md-apps"           :face '(:foreground "#c678dd"  :weight bold :height 1.0)) cache)
-    (puthash "Web"       (nerd-icons-mdicon  "nf-md-web"              :face '(:foreground "#e06c75"  :weight bold :height 1.0)) cache)
-    (puthash "System"    (nerd-icons-mdicon  "nf-md-cog"              :face '(:foreground "#98c379"  :weight bold :height 1.0)) cache)
-    (puthash "Tools"     (nerd-icons-mdicon  "nf-md-hammer_wrench"    :face '(:foreground "#d19a66"  :weight bold :height 1.0)) cache)
-    (puthash "Context"   (nerd-icons-mdicon  "nf-md-lightning_bolt"   :face '(:foreground "#e5c07b"  :weight bold :height 1.0)) cache)
-    (puthash "Tasks"     (nerd-icons-octicon "nf-oct-checklist"       :face '(:foreground "#61afef"  :weight bold :height 1.0)) cache)
-    cache)
-  "Pre-loaded icon cache with consistent styling.")
+;;;; Icons (computed once at load; per-file icons computed lazily)
 
-;; Add fallback icon function
-(defun universal-launcher--get-icon-safe (type)
-  "Get icon for TYPE with fallback."
-  (condition-case nil
-      (or (gethash type universal-launcher--icon-cache)
-          (nerd-icons-octicon "nf-oct-dash" :face '(:foreground "#abb2bf" :height 0.9)))
-    (error "")))
+(defvar universal-launcher--type-icons
+  (cl-flet ((i (fn name color) (funcall fn name :face `(:foreground ,color :height 0.9))))
+    `((buffer   . ,(i #'nerd-icons-octicon "nf-oct-file_code"     "#3d424a"))
+      (window   . ,(i #'nerd-icons-mdicon  "nf-md-monitor"        "#8b919a"))
+      (app      . ,(i #'nerd-icons-faicon  "nf-fa-cube"           "#e0dcd4"))
+      (command  . ,(i #'nerd-icons-octicon "nf-oct-terminal"      "#98c379"))
+      (bookmark . ,(i #'nerd-icons-octicon "nf-oct-bookmark"      "#b8c4b8"))
+      (ssh      . ,(i #'nerd-icons-faicon  "nf-fa-server"         "#98c379"))
+      (task     . ,(i #'nerd-icons-octicon "nf-oct-checklist"     "#61afef"))
+      (kill     . ,(i #'nerd-icons-faicon  "nf-fa-clipboard"      "#c678dd"))
+      (emoji    . ,(i #'nerd-icons-mdicon  "nf-md-emoticon"       "#e5c07b"))
+      (action   . ,(i #'nerd-icons-mdicon  "nf-md-lightning_bolt" "#e5c07b")))))
 
-(defun universal-launcher--get-file-icon (filename)
-  "Get appropriate icon for FILENAME."
-  (nerd-icons-icon-for-file filename))
+(defvar universal-launcher--group-icons
+  (cl-flet ((i (fn name color) (funcall fn name :face `(:foreground ,color :weight bold))))
+    `(("Context"      . ,(i #'nerd-icons-mdicon  "nf-md-lightning_bolt" "#e5c07b"))
+      ("Active"       . ,(i #'nerd-icons-mdicon  "nf-md-view_dashboard" "#61afef"))
+      ("Tasks"        . ,(i #'nerd-icons-octicon "nf-oct-checklist"     "#61afef"))
+      ("Files & Apps" . ,(i #'nerd-icons-mdicon  "nf-md-apps"           "#c678dd"))
+      ("Web"          . ,(i #'nerd-icons-mdicon  "nf-md-web"            "#e06c75"))
+      ("System"       . ,(i #'nerd-icons-mdicon  "nf-md-cog"            "#98c379"))
+      ("Tools"        . ,(i #'nerd-icons-mdicon  "nf-md-hammer_wrench"  "#d19a66")))))
 
-(defun universal-launcher--grouped-candidates ()
-  "Return candidates grouped by category."
-  (let ((candidates '())
-        (category-handlers (make-hash-table :test 'eq)))
+;;;; Primitives
 
-    ;; Define ALL handlers FIRST - before processing categories
-    (puthash 'buffer
-             (lambda ()
-               (mapcar (lambda (buffer)
-                         (cons (format "%s Buffer: %s"
-                                       (universal-launcher--get-icon 'buffer)
-                                       (buffer-name buffer))
-                               (list 'buffer buffer)))
-                       (buffer-list)))
-             category-handlers)
+(defun universal-launcher--cand (text type payload)
+  (propertize text 'ul-type type 'ul-payload payload))
 
-    (puthash 'running
-             (lambda ()
-               (mapcar (lambda (app)
-                         (cons (format "%s Running: %s"
-                                       (universal-launcher--get-icon 'running)
-                                       (car app))
-                               (list 'running (cdr app))))
-                       (universal-launcher--get-running-applications)))
-             category-handlers)
+(defun universal-launcher--stamp (path)
+  "Fingerprint PATH as (TRUENAME . MTIME).
+Store paths (Guix, Nix) all have mtime 1; a new profile generation is
+visible only through the resolved symlink target."
+  (let* ((file-name-handler-alist nil)
+         (true (file-truename path)))
+    (cons true (file-attribute-modification-time (file-attributes true)))))
 
-    (puthash 'file
-             (lambda ()
-               (mapcar (lambda (file)
-                         (let ((filename (file-name-nondirectory file))
-                               (directory (file-name-directory file)))
-                           (cons (format "%s File: %s  %s"
-                                         (universal-launcher--get-file-icon file)
-                                         filename
-                                         (propertize (abbreviate-file-name directory) 'face 'font-lock-comment-face))
-                                 (list 'file file))))
-                       recentf-list))
-             category-handlers)
+(defun universal-launcher--sway (cmd)
+  (call-process "swaymsg" nil 0 nil cmd))
 
-    (puthash 'app
-             (lambda ()
-               (mapcar (lambda (app)
-                         (cons (format "%s %s"
-                                       (universal-launcher--get-icon 'app)
-                                       (car app))
-                               (list 'app (cdr app))))
-                       (universal-launcher--get-applications)))
-             category-handlers)
+(defun universal-launcher--spawn (cmd)
+  "Run shell CMD detached from Emacs.  Under sway, sway is the parent."
+  (if (getenv "SWAYSOCK")
+      (universal-launcher--sway (concat "exec " cmd))
+    (call-process "setsid" nil 0 nil "-f" "sh" "-c" cmd)))
 
-    (puthash 'flatpak
-             (lambda ()
-               (mapcar (lambda (app)
-                         (cons (format "%s Flatpak: %s"
-                                       (universal-launcher--get-icon 'flatpak)
-                                       (car app))
-                               (list 'app (cdr app))))
-                       (universal-launcher--get-flatpak-applications)))
-             category-handlers)
+;;;; Volatile sources (every popup; all cheap)
 
-    (puthash 'nix
-             (lambda ()
-               (mapcar (lambda (app)
-                         (cons (format "%s Nix: %s"
-                                       (universal-launcher--get-icon 'nix)
-                                       (car app))
-                               (list 'app (cdr app))))
-                       (universal-launcher--get-nix-applications)))
-             category-handlers)
+(defun universal-launcher--buffers ()
+  (cl-loop for b in (buffer-list)
+           for name = (buffer-name b)
+           unless (string-prefix-p " " name)
+           collect (universal-launcher--cand (concat "Buffer: " name) 'buffer b)))
 
-    (puthash 'bookmark
-             (lambda ()
-               (mapcar (lambda (bookmark)
-                         (cons (format "%s Bookmark: %s"
-                                       (universal-launcher--get-icon 'bookmark)
-                                       (car bookmark))
-                               (list 'bookmark (cdr bookmark))))
-                       (universal-launcher--parse-org-bookmarks
-                        (expand-file-name "~/org/bookmarks.org"))))
-             category-handlers)
-
-    (puthash 'firefox-action
-             (lambda ()
-               (mapcar (lambda (action)
-                         (cons (format "%s Firefox: %s"
-                                       (universal-launcher--get-icon 'firefox)
-                                       (car action))
-                               (list 'firefox-action (cdr action))))
-                       (universal-launcher--get-firefox-actions)))
-             category-handlers)
-
-    (puthash 'command
-             (lambda ()
-               (mapcar (lambda (cmd)
-                         (cons (format "%s Command %s"
-                                       (universal-launcher--get-icon 'command)
-                                       cmd)
-                               (list 'command cmd)))
-                       (universal-launcher--get-system-commands)))
-             category-handlers)
-
-    (puthash 'emoji
-             (lambda ()
-               (mapcar (lambda (emoji)
-                         (cons (format "%s Emoji: %s %s"
-                                       (universal-launcher--get-icon 'emoji)
-                                       (car emoji)
-                                       (cdr emoji))
-                               (list 'emoji (cdr emoji))))
-                       universal-launcher--common-emojis))
-             category-handlers)
-
-    (puthash 'calculator
-             (lambda ()
-               (list (cons (format "%s Calculator: Enter math expression"
-                                   (universal-launcher--get-icon 'calculator))
-                           (list 'calculator 'ready))))
-             category-handlers)
-
-    ;; NEW HANDLERS - Add these BEFORE processing categories
-    (puthash 'contextual
-             #'universal-launcher--get-contextual-actions
-             category-handlers)
-
-    (puthash 'ssh
-             #'universal-launcher--get-ssh-hosts
-             category-handlers)
-
-    (puthash 'agenda-task
-             #'universal-launcher--get-agenda-tasks
-             category-handlers)
-
-    (puthash 'kill-ring-item
-             #'universal-launcher--get-kill-ring
-             category-handlers)
-
-    (puthash 'custom-action
-             #'universal-launcher--get-custom-actions
-             category-handlers)
-
-    ;; NOW process categories - handlers are all defined above
-    (dolist (category universal-launcher--categories)
-      (let* ((cat-name (plist-get category :name))
-             (cat-icon (gethash cat-name universal-launcher--icon-cache))
-             (types (plist-get category :types))
-             (section-items '()))
-
-        (dolist (type types)
-          (when-let* ((handler (gethash type category-handlers)))
-            (setq section-items (append section-items (funcall handler)))))
-
-        (when section-items
-          (push (cons (format "%s  %s " cat-icon cat-name) 'separator) candidates)
-          (dolist (item section-items)
-            (push (cons (concat "   " (car item)) (cdr item)) candidates)))))
-
-    (nreverse candidates)))
-
-(defun universal-launcher--update-candidates (&optional force)
-  "Update cached candidates if needed or FORCE is non-nil."
-  (when (or force
-            (> (- (float-time) universal-launcher--last-update)
-               universal-launcher--update-interval))
-    (setq universal-launcher--all-candidates (universal-launcher--grouped-candidates))
-    (setq universal-launcher--last-update (float-time))))
-
-(defun universal-launcher--get-icon (type)
-  "Get cached icon for TYPE instantly."
-  (gethash type universal-launcher--icon-cache ""))
-
-(defun universal-launcher--get-running-applications ()
-  "Get list of currently running applications."
-  (let ((apps '()))
+(defun universal-launcher--windows ()
+  "Sway views, via one get_tree call.  Replaces X11-only wmctrl."
+  (when (getenv "SWAYSOCK")
     (with-temp-buffer
-      (when (= 0 (call-process "wmctrl" nil t nil "-l"))
+      (when (eq 0 (call-process "swaymsg" nil t nil "-r" "-t" "get_tree"))
         (goto-char (point-min))
-        (while (re-search-forward "^\\(0x[0-9a-f]+\\)\\s-+\\S-+\\s-+\\S-+\\s-+\\(.+\\)$" nil t)
-          (let ((window-id (match-string-no-properties 1))
-                (app-name (match-string-no-properties 2)))
-            (unless (string-match-p "\\(Desktop\\|Dock\\|Emacs\\)" app-name)
-              (push (cons app-name (list window-id app-name)) apps))))))
-    apps))
+        (let (acc)
+          (cl-labels
+              ((walk (n)
+                 (when (plist-get n :pid)
+                   (let ((app (or (plist-get n :app_id)
+                                  (plist-get (plist-get n :window_properties) :class)
+                                  "?")))
+                     (unless (string-match-p "\\`[Ee]macs\\'" app)
+                       (push (universal-launcher--cand
+                              (format "Window: %s  %s %s" app (or (plist-get n :name) "")
+                                      (propertize (format "#%d" (plist-get n :id))
+                                                  'face 'shadow))
+                              'window (plist-get n :id))
+                             acc))))
+                 (mapc #'walk (plist-get n :nodes))
+                 (mapc #'walk (plist-get n :floating_nodes))))
+            (walk (json-parse-buffer :object-type 'plist :null-object nil)))
+          (nreverse acc))))))
 
-(defun universal-launcher--get-applications ()
-  "Get list of system applications from .desktop files.
-Excludes flatpak and nix exports — those have dedicated handlers."
-  (let ((apps '())
-        (dirs '("/usr/share/applications/"
-                "/usr/local/share/applications/"
-                "~/.local/share/applications/"
-                "~/.guix-profile/share/applications/"
-                "/run/current-system/profile/share/applications/")))
-    (dolist (dir dirs)
-      (when (file-directory-p (expand-file-name dir))
-        (dolist (file (directory-files (expand-file-name dir) t "\\.desktop$"))
-          (with-temp-buffer
-            (insert-file-contents file)
-            (when (re-search-forward "^Name=\\(.+\\)$" nil t)
-              (let ((name (match-string 1))
-                    exec-line)
-                (goto-char (point-min))
-                (when (re-search-forward "^Exec=\\(.+\\)$" nil t)
-                  (setq exec-line (match-string 1))
-                  (push (cons name (replace-regexp-in-string "%[FfUu]" "" exec-line))
-                        apps))))))))
-    (cl-remove-duplicates apps :test (lambda (a b) (string= (car a) (car b))) :from-end t)))
+(defun universal-launcher--kill-ring ()
+  (cl-loop for item in kill-ring
+           for i from 1 to 15
+           when (and (stringp item) (string-match-p "[^[:space:]]" item))
+           collect (universal-launcher--cand
+                    (format "Clip %d: %s" i
+                            (truncate-string-to-width
+                             (string-replace "\n" " ↩ " (substring-no-properties item))
+                             60 nil nil "…"))
+                    'kill item)))
 
-(defun universal-launcher--get-flatpak-applications ()
-  "Get list of installed Flatpak applications."
-  (let ((apps '()))
-    (when (executable-find "flatpak")
-      (with-temp-buffer
-        (dolist (scope '("--user" "--system"))
-          (erase-buffer)
-          ;; --columns with no header: use machine-readable output
-          (when (= 0 (call-process "flatpak" nil t nil
-                                   "list" "--app" scope
-                                   "--columns=name,application"))
-            (goto-char (point-min))
-            (while (not (eobp))
-              (let* ((line (buffer-substring-no-properties
-                            (line-beginning-position) (line-end-position)))
-                     (parts (split-string line "\t" t))
-                     (name (car parts))
-                     (app-id (cadr parts)))
-                (when (and name app-id
-                           (not (string-empty-p (string-trim name)))
-                           (not (string-empty-p (string-trim app-id))))
-                  (push (cons (format "%s (Flatpak)" (string-trim name))
-                              (universal-launcher--flatpak-run-command
-                               (string-trim app-id)))
-                        apps)))
-              (forward-line 1))))))
-    (cl-remove-duplicates apps :test (lambda (a b) (string= (cdr a) (cdr b))))))
+(defun universal-launcher--mode-match-p (modes)
+  (or (eq modes t)
+      (cl-some (lambda (m) (provided-mode-derived-p major-mode m))
+               (ensure-list modes))))
 
-(defun universal-launcher--flatpak-run-command (app-id)
-  "Build a launch command for APP-ID that works without an inherited session bus."
-  (if (getenv "DBUS_SESSION_BUS_ADDRESS")
-      (concat "flatpak run " app-id)
-    (concat "dbus-run-session -- flatpak run " app-id)))
+(defun universal-launcher--actions ()
+  (let (acc)
+    (pcase-dolist (`(,modes ,root ,label . ,actions) universal-launcher-mode-actions)
+      (when (universal-launcher--mode-match-p modes)
+        (let ((dir (or (and root (locate-dominating-file default-directory root))
+                       default-directory)))
+          (pcase-dolist (`(,name . ,act) actions)
+            (when (or (stringp act) (fboundp act))
+              (push (universal-launcher--cand (format "%s: %s" label name)
+                                              'action (cons dir act))
+                    acc))))))
+    (pcase-dolist (`(,name . ,act) universal-launcher-custom-actions)
+      (push (universal-launcher--cand (concat "Custom: " name) 'action
+                                      (cons default-directory
+                                            (if (consp act) (cdr act) act)))
+            acc))
+    (nreverse acc)))
 
-(defun universal-launcher--get-nix-applications ()
-  "Get Nix (nixpkgs) applications from the user profile's desktop entries."
-  (let* ((appsdir (expand-file-name "~/.nix-profile/share/applications"))
-         (apps '()))
-    (when (file-directory-p appsdir)
-      (dolist (file (directory-files appsdir t "\\.desktop\\'"))
-        (with-temp-buffer
-          (insert-file-contents file)
-          (goto-char (point-min))
-          (let (name exec type no-display hidden
-                     (end (save-excursion
-                            (if (re-search-forward "^\\[Desktop Action" nil t)
-                                (match-beginning 0)
-                              (point-max)))))
-            (when (re-search-forward "^\\[Desktop Entry\\]" nil t)
-              (while (re-search-forward
-                      "^\\([A-Za-z0-9-]+\\)[[:space:]]*=[[:space:]]*\\(.*\\)$" end t)
-                (pcase (match-string 1)
-                  ("Name"      (unless name (setq name (match-string 2))))
-                  ("Exec"      (unless exec (setq exec (match-string 2))))
-                  ("Type"      (setq type (match-string 2)))
-                  ("NoDisplay" (setq no-display (string= (match-string 2) "true")))
-                  ("Hidden"    (setq hidden (string= (match-string 2) "true"))))))
-            (when (and name exec (equal type "Application")
-                       (not no-display) (not hidden))
-              (push (cons name
-                          (string-trim
-                           (replace-regexp-in-string "%[a-zA-Z]" "" exec)))
-                    apps))))))
-    (cl-remove-duplicates apps :test (lambda (a b) (string= (car a) (car b))) :from-end t)))
+;;;; Fingerprinted sources
 
-;; TODO Calculator Module
-;; Calculator Module
-(defun universal-launcher--is-calculator-input (input)
-  "Check if INPUT is a math expression."
-  (and (not (string-empty-p input))
-       (not (string-match-p "^[[:space:]]*$" input))
-       ;; Allow more mathematical symbols and functions
-       (string-match-p "^[0-9+\\-*/().,^ %!sincotaqrexplog]+$" input)
-       ;; Must contain at least one operator or math function
-       (or (string-match-p "[+\\-*/^%]" input)
-           (string-match-p "\\(sin\\|cos\\|tan\\|sqrt\\|exp\\|log\\)" input))
-       ;; Must contain at least one number
-       (string-match-p "[0-9]" input)))
+(defun universal-launcher--files-key ()
+  (copy-sequence recentf-list))
 
-(defun universal-launcher--calculate (expr)
-  "Calculate mathematical expression EXPR using calc."
-  (condition-case err
-      (let* ((clean-expr (string-trim expr))
-             ;; Replace common notations
-             (calc-expr (replace-regexp-in-string "\\^" "**" clean-expr))
-             (calc-expr (replace-regexp-in-string "×" "*" calc-expr))
-             (calc-expr (replace-regexp-in-string "÷" "/" calc-expr))
-             (result (calc-eval calc-expr)))
-        (if (and result
-                 (stringp result)
-                 (not (string= result ""))
-                 (not (string-match-p "\\(Error\\|Bad\\)" result))
-                 ;; Accept various number formats including scientific notation
-                 (or (string-match-p "^[-+]?[0-9]+\\.?[0-9]*\\(?:[eE][-+]?[0-9]+\\)?$" result)
-                     (string-match-p "^[-+]?[0-9]+/[0-9]+$" result))) ; fractions
-            result
-          nil))
-    (error nil)))
+(defun universal-launcher--files ()
+  (mapcar (lambda (f)
+            (universal-launcher--cand
+             (concat "File: " (file-name-nondirectory f) "  "
+                     (propertize (abbreviate-file-name (or (file-name-directory f) ""))
+                                 'face 'font-lock-comment-face))
+             'file f))
+          recentf-list))
 
-(defun universal-launcher--copy-to-clipboard (text)
-  "Copy TEXT to system clipboard, handling both X11 and Wayland."
-  (cond
-   ;; GUI Emacs - use built-in
-   ((display-graphic-p)
-    (gui-set-selection 'CLIPBOARD text))
-   ;; Terminal with wl-copy (Wayland)
-   ((executable-find "wl-copy")
-    (let ((process (start-process "wl-copy" nil "wl-copy")))
-      (process-send-string process text)
-      (process-send-eof process)))
-   ;; Terminal with xclip (X11)
-   ((executable-find "xclip")
-    (let ((process (start-process "xclip" nil "xclip" "-selection" "clipboard")))
-      (process-send-string process text)
-      (process-send-eof process)))
-   ;; Fallback
-   (t
-    (kill-new text)
-    (message "Copied to Emacs kill ring (install wl-copy or xclip for system clipboard)"))))
+(defun universal-launcher--app-dirs ()
+  "XDG application dirs in precedence order.  Covers Guix, Nix, and
+flatpak exports, provided Emacs inherited the session's XDG_DATA_DIRS."
+  (cl-loop for d in (cons (or (getenv "XDG_DATA_HOME") "~/.local/share")
+                          (split-string (or (getenv "XDG_DATA_DIRS")
+                                            "/usr/local/share:/usr/share")
+                                        ":" t))
+           for a = (expand-file-name "applications" d)
+           when (file-directory-p a) collect a))
 
-;; Enhanced calculator handler for the main popup function
-(defun universal-launcher--handle-calculator-input (input)
-  "Handle calculator INPUT with immediate calculation."
-  (let ((result (universal-launcher--calculate input)))
-    (if result
-        (progn
-          (universal-launcher--copy-to-clipboard result)
-          (message "📊 %s = %s (copied to clipboard)" input result)
-          ;; If in a buffer, optionally insert the result
-          (when (and universal-launcher--previous-frame
-                     (frame-live-p universal-launcher--previous-frame))
-            (with-selected-frame universal-launcher--previous-frame
-              (when (and (not (minibufferp))
-                         (not buffer-read-only)
-                         (y-or-n-p "Insert result at point? "))
-                (insert result)))))
-      (message "❌ Invalid expression: %s" input))))
+(defun universal-launcher--apps-key ()
+  (mapcar #'universal-launcher--stamp (universal-launcher--app-dirs)))
 
-(defun universal-launcher--get-system-commands ()
-  "Get system commands from PATH."
-  (let ((commands '()))
-    (dolist (dir (parse-colon-path (getenv "PATH")))
+(defun universal-launcher--parse-desktop ()
+  "Parse [Desktop Entry] in the current buffer to (NAME . EXEC), or nil."
+  (goto-char (point-min))
+  (when (re-search-forward "^\\[Desktop Entry\\][ \t]*$" nil t)
+    (let ((end (save-excursion
+                 (if (re-search-forward "^\\[" nil t) (match-beginning 0) (point-max))))
+          name exec type hide)
+      (while (re-search-forward "^\\([A-Za-z0-9-]+\\)[ \t]*=[ \t]*\\(.*\\)$" end t)
+        (pcase (match-string 1)
+          ("Name" (setq name (or name (match-string 2))))
+          ("Exec" (setq exec (or exec (match-string 2))))
+          ("Type" (setq type (match-string 2)))
+          ((or "NoDisplay" "Hidden")
+           (when (equal (match-string 2) "true") (setq hide t)))))
+      (when (and name exec (equal type "Application") (not hide))
+        (cons name (string-trim
+                    (string-replace "%%" "%"
+                                    (replace-regexp-in-string
+                                     "%[fFuUdDnNickvm]" "" exec t t))))))))
+
+(defun universal-launcher--apps ()
+  "Desktop entries.  First desktop-file ID wins, per the XDG spec, so a
+user override (including Hidden=true) shadows the system entry."
+  (let ((seen (make-hash-table :test #'equal))
+        (file-name-handler-alist nil)
+        (coding-system-for-read 'utf-8)
+        acc)
+    (with-temp-buffer
+      (dolist (dir (universal-launcher--app-dirs))
+        (dolist (f (directory-files dir t "\\.desktop\\'" t))
+          (let ((id (file-name-nondirectory f)))
+            (unless (gethash id seen)
+              (puthash id t seen)
+              (erase-buffer)
+              (insert-file-contents f)
+              (when-let* ((app (universal-launcher--parse-desktop)))
+                (push (universal-launcher--cand (concat "App: " (car app))
+                                                'app (cdr app))
+                      acc)))))))
+    (sort acc #'string<)))
+
+(defun universal-launcher--path-dirs ()
+  (parse-colon-path (getenv "PATH")))
+
+(defun universal-launcher--commands-key ()
+  (mapcar #'universal-launcher--stamp (universal-launcher--path-dirs)))
+
+(defun universal-launcher--commands ()
+  "Names in PATH, first occurrence wins.  No per-file stat: profile bin
+dirs contain only executables, and stat x 4000 was the cost."
+  (let ((seen (make-hash-table :test #'equal :size 4096))
+        (file-name-handler-alist nil)
+        acc)
+    (dolist (dir (universal-launcher--path-dirs))
       (when (file-directory-p dir)
-        (dolist (file (directory-files dir t))
-          (when (and (file-executable-p file)
-                     (not (file-directory-p file))
-                     (not (backup-file-name-p file)))
-            (push (file-name-nondirectory file) commands)))))
-    (cl-remove-duplicates commands :test #'string=)))
+        (dolist (name (directory-files dir nil "\\`[^.]" t))
+          (unless (gethash name seen)
+            (puthash name t seen)
+            (push (universal-launcher--cand (concat "Run: " name) 'command name) acc)))))
+    (sort acc #'string<)))
 
-(defun universal-launcher--get-firefox-actions ()
-  "Get list of Firefox actions."
-  (let ((actions '()))
-    (when (= 0 (call-process "pgrep" nil nil nil "-x" "firefox"))
-      (push (cons "Focus Firefox window" '(focus-window)) actions)
-      (push (cons "Open new tab" '(new-tab)) actions)
-      (let ((common-sites '(("Google" . "https://www.google.com")
-                            ("GitHub" . "https://github.com")
-                            ("YouTube" . "https://www.youtube.com")
-                            ("Wikipedia" . "https://en.wikipedia.org"))))
-        (dolist (site common-sites)
-          (push (cons (concat "Open " (car site))
-                      (list 'open-url (cdr site)))
-                actions))))
-    actions))
+(defun universal-launcher--domain (url)
+  (if (string-match "\\`https?://\\(?:www\\.\\)?\\([^/]+\\)" url) (match-string 1 url) url))
 
-(defun universal-launcher--parse-org-bookmarks (file)
-  "Parse bookmarks from an org FILE with support for various formats."
-  (let ((bookmarks '()))
-    (when (file-exists-p file)
+(defun universal-launcher--bookmarks-key ()
+  (universal-launcher--stamp (expand-file-name universal-launcher-bookmarks-file)))
+
+(defun universal-launcher--bookmarks ()
+  "Org links and bare URLs, by regex.  No `org-mode', no hooks."
+  (let ((file (expand-file-name universal-launcher-bookmarks-file))
+        (seen (make-hash-table :test #'equal))
+        acc)
+    (when (file-readable-p file)
       (with-temp-buffer
         (insert-file-contents file)
-        (org-mode)
-        ;; Use org-element-map to parse the entire buffer
-        (org-element-map (org-element-parse-buffer) 'link
-          (lambda (link)
-            (when (member (org-element-property :type link) '("http" "https"))
-              (let* ((raw-link (org-element-property :raw-link link))
-                     ;; Extract just the URL part using regex, excluding initial [ or ]
-                     (url-candidate (if (string-match "^\\(https?://[^]\\[]+\\)" raw-link)
-                                        (match-string 1 raw-link)
-                                      raw-link))
-                     ;; Remove trailing slash if present and it's not the only char after "://"
-                     (url (if (and url-candidate
-                                   (> (length url-candidate) (if (string-prefix-p "https" url-candidate) 8 7)) ; "https://" is 8, "http://" is 7
-                                   (string-suffix-p "/" url-candidate))
-                              (substring url-candidate 0 -1)
-                            url-candidate))
-                     (desc (or (org-element-interpret-data
-                                (org-element-contents link))
-                               (universal-launcher--extract-domain url))))
-                (when url ; Ensure URL is not nil
-                  (push (cons (if (string-empty-p desc)
-                                  (universal-launcher--extract-domain url)
-                                desc)
-                              url)
-                        bookmarks))))))
-        ;; Also parse plain URLs
-        (goto-char (point-min))
-        ;; Regex now excludes ']', '[', space, tab, and newline from the URL part
-        (while (re-search-forward "\\bhttps?://[^]\\[ \t\n]+" nil t)
-          (let* ((url-candidate (match-string-no-properties 0))
-                 ;; Remove trailing slash if present
-                 (url (if (and url-candidate
-                               (> (length url-candidate) (if (string-prefix-p "https" url-candidate) 8 7))
-                               (string-suffix-p "/" url-candidate))
-                          (substring url-candidate 0 -1)
-                        url-candidate)))
-            (when url ; Ensure URL is not nil
-              (unless (rassoc url bookmarks) ; Check against the processed URL
-                (push (cons (universal-launcher--extract-domain url) url)
-                      bookmarks)))))))
-    ;; Sort by description and remove duplicates by URL
-    (cl-remove-duplicates
-     (sort bookmarks (lambda (a b) (string< (car a) (car b))))
-     :test (lambda (a b) (string= (cdr a) (cdr b)))
-     :from-end t)))
+        (cl-flet ((add (url desc)
+                    (let ((url (if (string-match-p "[^/]/\\'" url) (substring url 0 -1) url)))
+                      (unless (gethash url seen)
+                        (puthash url t seen)
+                        (push (universal-launcher--cand
+                               (concat "Bookmark: "
+                                       (if (string-empty-p desc)
+                                           (universal-launcher--domain url)
+                                         desc))
+                               'bookmark url)
+                              acc)))))
+          ;; Org links first so their descriptions beat bare-URL fallbacks.
+          (while (re-search-forward
+                  "\\[\\[\\(https?://[^]]+\\)\\]\\(?:\\[\\([^]]*\\)\\]\\)?\\]" nil t)
+            (add (match-string-no-properties 1) (or (match-string-no-properties 2) "")))
+          (goto-char (point-min))
+          (while (re-search-forward "https?://[^][ \t\n<>\"]+" nil t)
+            (add (match-string-no-properties 0) "")))))
+    (sort acc #'string<)))
 
-(defun universal-launcher--extract-domain (url)
-  "Extract readable domain name from URL."
-  (if (string-match "https?://\\([^/]+\\)" url)
-      (let ((domain (match-string 1 url)))
-        (if (string-match "^www\\." domain)
-            (substring domain 4)
-          domain))
-    url))
+(defun universal-launcher--ssh-key ()
+  (universal-launcher--stamp (expand-file-name "~/.ssh/config")))
 
-(defun universal-launcher--focus-running-application (app-info)
-  "Focus running application using APP-INFO."
-  (let ((window-id (car app-info))
-        (app-name (cadr app-info)))
-    (condition-case nil
-        (call-process "wmctrl" nil nil nil "-i" "-a" window-id)
-      (error
-       (call-process "wmctrl" nil nil nil "-a" app-name)))))
+(defun universal-launcher--ssh-hosts ()
+  (let ((config (expand-file-name "~/.ssh/config"))
+        (case-fold-search t)
+        acc)
+    (when (file-readable-p config)
+      (with-temp-buffer
+        (insert-file-contents config)
+        (while (re-search-forward "^[ \t]*Host[ \t]+\\(.+\\)$" nil t)
+          ;; `Host a b c' declares three patterns.
+          (dolist (h (split-string (match-string-no-properties 1)))
+            (unless (string-match-p "[*?!]" h)
+              (push (universal-launcher--cand (concat "SSH: " h) 'ssh h) acc))))))
+    (nreverse acc)))
 
-(defun universal-launcher--run-application (exec-string)
-  "Run application with EXEC-STRING."
-  (let* ((exec-parts (split-string exec-string))
-         (cmd (car exec-parts))
-         (proc (apply #'start-process cmd nil exec-parts)))
-    ;; Capture cmd in a closure to avoid void-variable error
-    (run-with-timer 0.5 nil
-                    (lambda (command-name)
-                      (call-process "wmctrl" nil nil nil "-a" command-name))
-                    cmd)))
+(defun universal-launcher--tasks-key ()
+  "Edit tick for visited agenda files, stamp otherwise.  Any edit
+invalidates, so cached (BUFFER . POS) payloads are always current."
+  (when (and (featurep 'org) org-agenda-files)
+    (mapcar (lambda (f)
+              (if-let* ((b (get-file-buffer f)))
+                  (buffer-chars-modified-tick b)
+                (universal-launcher--stamp f)))
+            (org-agenda-files t))))
 
-(defun universal-launcher--handle-firefox-action (action)
-  "Handle firefox ACTION."
-  (pcase (car action)
-    ('focus-window
-     (call-process "wmctrl" nil nil nil "-a" "Firefox"))
-    ('new-tab
-     (call-process "firefox" nil nil nil "--new-tab" "about:newtab"))
-    ('org-task
-     (universal-launcher--jump-to-task item))
-    ('ssh
-     (universal-launcher--ssh-connect item))
-    ('kill-ring
-     (universal-launcher--yank-from-ring item))
-    ('custom-action
-     (universal-launcher--execute-custom-action item))
-    ('async-shell
-     (let ((default-directory (or (locate-dominating-file default-directory ".git")
-                                  default-directory)))
-       (async-shell-command item)))
-    ('open-url
-     (let ((url (cadr action)))
-       (call-process "firefox" nil nil nil "--new-tab" url)))))
+(defun universal-launcher--tasks ()
+  (when (and (featurep 'org) org-agenda-files)
+    (let (acc)
+      (org-map-entries
+       (lambda ()
+         (push (universal-launcher--cand
+                (format "Task: %s %s  %s"
+                        (propertize (or (org-get-todo-state) "TODO") 'face 'org-todo)
+                        (org-get-heading t t t t)
+                        (propertize (buffer-name) 'face 'font-lock-comment-face))
+                'task (cons (current-buffer) (point)))
+               acc))
+       "+TODO=\"TODO\"|+TODO=\"NEXT\"|+TODO=\"STARTED\""
+       'agenda)
+      (nreverse acc))))
 
-(defun universal-launcher--handle-bookmark (url)
-  "Open URL in the default browser."
-  (browse-url url))
+(defun universal-launcher--emojis ()
+  (mapcar (lambda (e)
+            (universal-launcher--cand (format "Emoji: %s %s" (car e) (cdr e)) 'emoji (cdr e)))
+          universal-launcher--common-emojis))
 
-(defun universal-launcher--run-command (command)
-  "Run COMMAND."
-  (start-process command nil command))
+;;;; Collection
+
+(defvar universal-launcher--memo (make-hash-table :test #'eq)
+  "FETCH -> (FINGERPRINT . CANDIDATES).")
+
+(defun universal-launcher--fetch (group fetch key)
+  (let ((title (concat (alist-get group universal-launcher--group-icons "" nil #'equal)
+                       "  " group)))
+    (cl-flet ((run ()
+                (let ((cands (funcall fetch)))
+                  (dolist (c cands cands)
+                    (put-text-property 0 (length c) 'ul-group title c)))))
+      (if (null key)
+          (run)
+        (let ((k (funcall key))
+              (hit (gethash fetch universal-launcher--memo)))
+          (if (and hit (equal k (car hit)))
+              (cdr hit)
+            (cdr (puthash fetch (cons k (run)) universal-launcher--memo))))))))
+
+(defun universal-launcher--collect ()
+  (let ((gc-cons-threshold most-positive-fixnum))
+    (cl-loop for (group fetch key) in universal-launcher-sources
+             append (universal-launcher--fetch group fetch key))))
+
+;;;; Completion table
+
+(defun universal-launcher--group (cand transform)
+  (if transform cand (get-text-property 0 'ul-group cand)))
+
+(defun universal-launcher--affix (cands)
+  "Called by Vertico for visible rows only, so icon cost is O(screen)."
+  (mapcar (lambda (c)
+            (let ((type (get-text-property 0 'ul-type c)))
+              (list c
+                    (concat (if (eq type 'file)
+                                (nerd-icons-icon-for-file (get-text-property 0 'ul-payload c))
+                              (alist-get type universal-launcher--type-icons ""))
+                            " ")
+                    "")))
+          cands))
+
+(defun universal-launcher--table (cands)
+  (lambda (string pred action)
+    (if (eq action 'metadata)
+        '(metadata (category . universal-launcher)
+                   (group-function . universal-launcher--group)
+                   (affixation-function . universal-launcher--affix)
+                   (display-sort-function . identity)
+                   (cycle-sort-function . identity))
+      (complete-with-action action cands string pred))))
+
+;;;; Calculator
+
+(defconst universal-launcher--math-re
+  (rx bos (+ (or (any "0-9" ?- ?+ ?* ?/ ?^ ?% ?! ?\( ?\) ?. ?, ?\s)
+                 "sin" "cos" "tan" "sqrt" "exp" "ln" "log" "pi"))
+      eos))
+
+(defun universal-launcher--math-p (s)
+  (and (string-match-p universal-launcher--math-re s)
+       (string-match-p "[0-9]" s)
+       (string-match-p (rx (or (any ?- ?+ ?* ?/ ?^ ?% ?!)
+                               "sin" "cos" "tan" "sqrt" "exp" "ln" "log"))
+                       s)))
+
+(defun universal-launcher--calc (expr)
+  (let ((r (calc-eval expr)))          ; error => list, success => string
+    (if (stringp r)
+        (progn (kill-new r) (message "%s = %s (copied)" expr r))
+      (message "Invalid expression: %s" expr))))
+
+;;;; Dispatch
+
+(defun universal-launcher--execute (cand)
+  (let ((payload (get-text-property 0 'ul-payload cand)))
+    (pcase (get-text-property 0 'ul-type cand)
+      ('buffer   (when (buffer-live-p payload) (switch-to-buffer payload)))
+      ('window   (universal-launcher--sway (format "[con_id=%d] focus" payload)))
+      ((or 'app 'command) (universal-launcher--spawn payload))
+      ('file     (find-file payload))
+      ('bookmark (browse-url payload))
+      ('ssh      (universal-launcher--ssh-connect payload))
+      ('task     (pop-to-buffer-same-window (car payload))
+                 (goto-char (cdr payload))
+                 (org-fold-show-context)
+                 (recenter))
+      ('kill     (if buffer-read-only (kill-new payload) (insert payload)))
+      ('emoji    (kill-new payload) (message "Copied %s" payload))
+      ('action   (let ((default-directory (car payload)))
+                   (if (stringp (cdr payload))
+                       (async-shell-command (cdr payload))
+                     (call-interactively (cdr payload))))))))
+
+(defvar universal-launcher-history nil)
+(defvar universal-launcher--input ""
+  "Raw minibuffer input before exit; Vertico replaces it with the selection.")
+
+;;;###autoload
+(defun universal-launcher-popup ()
+  "Launch anything; evaluate math; fall back to web search.
+Math is judged on what you typed, not on what Vertico had selected."
+  (interactive)
+  (setq universal-launcher--input "")
+  (let* ((cands (universal-launcher--collect))
+         (sel (minibuffer-with-setup-hook
+                  (lambda ()
+                    (setq-local completion-ignore-case t)
+                    (add-hook 'post-command-hook
+                              (lambda ()
+                                (setq universal-launcher--input
+                                      (minibuffer-contents-no-properties)))
+                              nil t))
+                (completing-read "Launch: " (universal-launcher--table cands)
+                                 nil nil nil 'universal-launcher-history)))
+         (input (string-trim universal-launcher--input)))
+    (cond
+     ((universal-launcher--math-p input) (universal-launcher--calc input))
+     ((string-empty-p sel) nil)
+     ((when-let* ((c (car (member sel cands))))
+        (universal-launcher--execute c)
+        t))
+     (t (universal-launcher--web-search sel)))))
 
 ;; Web search function
 (defcustom universal-launcher-default-search-engine "DuckDuckGo"
@@ -662,199 +577,6 @@ C-u prefix forces engine re-selection."
                       query))
       (browse-url (concat url-base (url-hexify-string query))))))
 
-(defun universal-launcher--insert-emoji (emoji)
-  "Insert EMOJI at point and copy to clipboard."
-  (let ((frame universal-launcher--previous-frame))
-    (when (and frame (frame-live-p frame))
-      (select-frame-set-input-focus frame))
-    (gui-set-selection 'CLIPBOARD emoji)
-    (message "Emoji '%s' copied to clipboard" emoji)))
-
-
-;; ============================================================================
-;; FRECENCY SYSTEM - The Foundation of Intelligence
-;; ============================================================================
-
-(defvar universal-launcher--history-file
-  (expand-file-name "universal-launcher-history" user-emacs-directory)
-  "File to persist launch history.")
-
-(defvar universal-launcher--launch-history nil
-  "Alist of (item . (count . last-time)).")
-
-(defun universal-launcher--load-history ()
-  "Load launch history from disk."
-  (when (file-exists-p universal-launcher--history-file)
-    (condition-case nil
-        (with-temp-buffer
-          (insert-file-contents universal-launcher--history-file)
-          (setq universal-launcher--launch-history (read (current-buffer))))
-      (error
-       (setq universal-launcher--launch-history nil)
-       (message "Warning: Could not load launcher history")))))
-
-(defun universal-launcher--save-history ()
-  "Save launch history to disk."
-  (condition-case nil
-      (with-temp-buffer
-        (prin1 universal-launcher--launch-history (current-buffer))
-        (write-region (point-min) (point-max) universal-launcher--history-file nil 'silent))
-    (error (message "Warning: Could not save launcher history"))))
-
-(defun universal-launcher--record-launch (selection)
-  "Record SELECTION in history with frecency scoring."
-  (let* ((entry (assoc selection universal-launcher--launch-history))
-         (count (if entry (car (cdr entry)) 0))
-         (now (float-time)))
-    (setf (alist-get selection universal-launcher--launch-history nil nil #'equal)
-          (cons (1+ count) now))
-    (run-with-idle-timer 1 nil #'universal-launcher--save-history)))
-
-(defun universal-launcher--frecency-score (item-text)
-  "Calculate frecency score for ITEM-TEXT.
-Combines frequency (usage count) with recency (time decay)."
-  (if-let* ((data (alist-get item-text universal-launcher--launch-history nil nil #'equal)))
-      (let* ((count (car data))
-             (last-time (cdr data))
-             (age-days (/ (- (float-time) last-time) 86400.0))
-             ;; Exponential decay: half-life of 7 days
-             (recency-factor (exp (/ (- age-days) 7.0))))
-        (* count recency-factor))
-    0))
-
-;; ============================================================================
-;; CONTEXTUAL ACTIONS - Mode-Aware Intelligence
-;; ============================================================================
-
-(defun universal-launcher--get-contextual-actions ()
-  "Get actions relevant to current buffer's major mode and project."
-  (when (and universal-launcher--previous-frame
-             (frame-live-p universal-launcher--previous-frame))
-    (with-selected-frame universal-launcher--previous-frame
-      (let ((actions '())
-            (icon (nerd-icons-mdicon "nf-md-lightning_bolt" :face '(:foreground "#e5c07b" :height 0.9))))
-
-        ;; Universal org-capture (always available)
-        (when (fboundp 'org-capture)
-          (push (cons (format "%s Capture: Quick note" icon)
-                      (list 'function #'org-capture))
-                actions))
-
-        ;; Mode-specific actions
-        (pcase major-mode
-          ;; Org Mode
-          ('org-mode
-           (when (fboundp 'org-agenda)
-             (push (cons (format "%s Org: Open Agenda" icon)
-                         (list 'function #'org-agenda))
-                   actions))
-           (push (cons (format "%s Org: Refile" icon)
-                       (list 'function #'org-refile))
-                 actions)
-           (push (cons (format "%s Org: Archive subtree" icon)
-                       (list 'function #'org-archive-subtree))
-                 actions)
-           (when (fboundp 'org-set-tags-command)
-             (push (cons (format "%s Org: Set tags" icon)
-                         (list 'function #'org-set-tags-command))
-                   actions)))
-
-          ;; Go Mode
-          ('go-mode
-           (let ((default-directory (or (locate-dominating-file default-directory "go.mod")
-                                        default-directory)))
-             (push (cons (format "%s Go: Run tests" icon)
-                         (list 'async-shell "go test -v ./..."))
-                   actions)
-             (push (cons (format "%s Go: Build" icon)
-                         (list 'async-shell "go build"))
-                   actions)
-             (push (cons (format "%s Go: Run main" icon)
-                         (list 'async-shell "go run ."))
-                   actions)
-             (push (cons (format "%s Go: Tidy modules" icon)
-                         (list 'async-shell "go mod tidy"))
-                   actions)
-             (push (cons (format "%s Go: Format code" icon)
-                         (list 'function #'gofmt))
-                   actions)))
-
-          ;; Rust Mode
-          ('rust-mode
-           (let ((default-directory (or (locate-dominating-file default-directory "Cargo.toml")
-                                        default-directory)))
-             (push (cons (format "%s Rust: Build" icon)
-                         (list 'async-shell "cargo build"))
-                   actions)
-             (push (cons (format "%s Rust: Run tests" icon)
-                         (list 'async-shell "cargo test"))
-                   actions)
-             (push (cons (format "%s Rust: Run" icon)
-                         (list 'async-shell "cargo run"))
-                   actions)
-             (push (cons (format "%s Rust: Check" icon)
-                         (list 'async-shell "cargo check"))
-                   actions)))
-
-          ;; Emacs Lisp Mode
-          ('emacs-lisp-mode
-           (push (cons (format "%s Elisp: Eval buffer" icon)
-                       (list 'function #'eval-buffer))
-                 actions)
-           (push (cons (format "%s Elisp: Eval defun" icon)
-                       (list 'function #'eval-defun))
-                 actions)
-           (push (cons (format "%s Elisp: Load file" icon)
-                       (list 'function #'load-file))
-                 actions))
-
-          ;; Nix Mode
-          ('nix-mode
-           (push (cons (format "%s Nix: Rebuild switch" icon)
-                       (list 'async-shell "sudo nixos-rebuild switch"))
-                 actions)
-           (push (cons (format "%s Nix: Rebuild test" icon)
-                       (list 'async-shell "sudo nixos-rebuild test"))
-                 actions)
-           (push (cons (format "%s Nix: Update flake" icon)
-                       (list 'async-shell "nix flake update"))
-                 actions))
-
-          ;; Markdown Mode
-          ('markdown-mode
-           (when (fboundp 'markdown-preview)
-             (push (cons (format "%s Markdown: Preview" icon)
-                         (list 'function #'markdown-preview))
-                   actions))
-           (push (cons (format "%s Markdown: Export to HTML" icon)
-                       (list 'function #'markdown-export))
-                 actions)))
-
-        (nreverse actions)))))
-
-;; ============================================================================
-;; SSH HOST LAUNCHER
-;; ============================================================================
-
-(defun universal-launcher--get-ssh-hosts ()
-  "Get SSH hosts from ~/.ssh/config."
-  (let ((hosts '())
-        (config (expand-file-name "~/.ssh/config"))
-        (icon (nerd-icons-faicon "nf-fa-server" :face '(:foreground "#98c379" :height 0.9))))
-    (when (file-exists-p config)
-      (with-temp-buffer
-        (insert-file-contents config)
-        (goto-char (point-min))
-        (while (re-search-forward "^Host \\(.+\\)$" nil t)
-          (let ((host (string-trim (match-string 1))))
-            ;; Skip wildcards and comments
-            (unless (or (string-match-p "[*?]" host)
-                        (string-prefix-p "#" host))
-              (push (cons (format "%s SSH: %s" icon host)
-                          (list 'ssh host))
-                    hosts))))))
-    (nreverse hosts)))
-
 (defun universal-launcher--ssh-connect (host)
   "Connect to SSH HOST using best available terminal."
   (cond
@@ -894,205 +616,8 @@ Combines frequency (usage count) with recency (time decay)."
       (insert (format "ssh %s" host))
       (comint-send-input)))))
 
-;; ============================================================================
-;; ORG AGENDA INTEGRATION
-;; ============================================================================
-
-(defun universal-launcher--get-agenda-tasks ()
-  "Get today's agenda tasks."
-  (when (and (fboundp 'org-map-entries)
-             (bound-and-true-p org-agenda-files))
-    (let ((tasks '())
-          (icon (nerd-icons-octicon "nf-oct-checklist" :face '(:foreground "#61afef" :height 0.9))))
-      (org-map-entries
-       (lambda ()
-         (let* ((heading (org-get-heading t t t t))
-                (todo-state (org-get-todo-state))
-                (priority (org-get-priority (thing-at-point 'line t)))
-                (tags (org-get-tags))
-                (display (format "%s %s %s%s"
-                                 icon
-                                 (propertize (or todo-state "TODO")
-                                             'face 'org-todo)
-                                 heading
-                                 (if tags
-                                     (propertize (format " :%s:" (string-join tags ":"))
-                                                 'face 'org-tag)
-                                   ""))))
-           (push (cons display
-                       (list 'org-task (point-marker)))
-                 tasks)))
-       "+TODO=\"TODO\"|+TODO=\"NEXT\"|+TODO=\"STARTED\""
-       'agenda)
-      (nreverse tasks))))
-
-(defun universal-launcher--jump-to-task (marker)
-  "Jump to org task at MARKER."
-  (when (marker-buffer marker)
-    (switch-to-buffer (marker-buffer marker))
-    (goto-char marker)
-    (org-show-context)
-    (org-reveal)
-    (recenter)))
-
-;; ============================================================================
-;; KILL RING SEARCH
-;; ============================================================================
-
-(defun universal-launcher--get-kill-ring ()
-  "Get recent kill ring entries."
-  (let ((icon (nerd-icons-faicon "nf-fa-clipboard" :face '(:foreground "#c678dd" :height 0.9))))
-    (cl-loop for item in (seq-take kill-ring 15)
-             for idx from 1
-             when (and (stringp item)
-                       (> (length item) 0)
-                       (not (string-match-p "^[[:space:]]*$" item)))
-             collect (cons (format "%s Clip #%d: %s"
-                                   icon
-                                   idx
-                                   (truncate-string-to-width
-                                    (replace-regexp-in-string "\n" "↩ " item)
-                                    60 nil nil "…"))
-                           (list 'kill-ring item)))))
-
-(defun universal-launcher--yank-from-ring (text)
-  "Insert TEXT from kill ring at point."
-  (when (and universal-launcher--previous-frame
-             (frame-live-p universal-launcher--previous-frame))
-    (with-selected-frame universal-launcher--previous-frame
-      (when (not buffer-read-only)
-        (insert text)
-        (message "Inserted from kill ring")))))
-
-;; ============================================================================
-;; CUSTOM ACTIONS/SCRIPTS
-;; ============================================================================
-
-(defcustom universal-launcher-custom-actions nil
-  "Custom actions as ((name . (type . action))).
-Type can be 'function, 'shell-command, or 'async-shell.
-
-Examples:
-  ((\"Daily Review\" . (function . my-daily-review-fn))
-   (\"Rebuild NixOS\" . (async-shell . \"sudo nixos-rebuild switch\"))
-   (\"Git Status\" . (shell-command . \"git status\")))"
-  :type '(alist :key-type string
-                :value-type (cons symbol sexp))
-  :group 'universal-launcher)
-
-(defun universal-launcher--get-custom-actions ()
-  "Get user-defined custom actions."
-  (let ((icon (nerd-icons-mdicon "nf-md-star" :face '(:foreground "#e5c07b" :height 0.9))))
-    (mapcar (lambda (action)
-              (cons (format "%s Custom: %s" icon (car action))
-                    (list 'custom-action (cdr action))))
-            universal-launcher-custom-actions)))
-
-(defun universal-launcher--execute-custom-action (action)
-  "Execute custom ACTION."
-  (let ((type (car action))
-        (cmd (cdr action)))
-    (pcase type
-      ('function
-       (if (functionp cmd)
-           (funcall cmd)
-         (message "Error: Not a valid function: %s" cmd)))
-      ('shell-command
-       (shell-command cmd))
-      ('async-shell
-       (async-shell-command cmd))
-      (_
-       (message "Unknown action type: %s" type)))))
-
-(defun universal-launcher-popup ()
-  "World-class launcher for Emacs."
-  (interactive)
-
-  ;; Store current frame
-  (setq universal-launcher--previous-frame (selected-frame))
-
-  ;; Force update if needed
-  (universal-launcher--update-candidates)
-
-  ;; Create candidates list with nil as completion table to allow any input
-  (let* ((candidates (mapcar #'car universal-launcher--all-candidates))
-         (prompt "🚀 Launch (or enter math expression): ")
-         (selection
-          (minibuffer-with-setup-hook
-              (lambda ()
-                ;; Allow any input, not just candidates
-                (setq-local completion-styles '(orderless basic))
-                (setq-local completion-ignore-case t)
-                (setq-local completion-category-overrides nil))
-            (completing-read prompt
-                             ;; Use a function that always returns all candidates
-                             ;; This allows typing anything while still showing candidates
-                             (lambda (string pred action)
-                               (if (eq action 'metadata)
-                                   '(metadata (category . universal-launcher))
-                                 (all-completions string candidates pred)))
-                             nil    ; predicate
-                             nil    ; require-match = nil allows any input!
-                             nil    ; initial-input
-                             nil    ; hist
-                             nil))) ; def
-         (candidate (cdr (assoc selection universal-launcher--all-candidates))))
-
-    (cond
-     ;; Empty input - do nothing
-     ((string-empty-p selection) nil)
-
-     ;; Calculator check - prioritize this before other matches
-     ((universal-launcher--is-calculator-input selection)
-      (universal-launcher--handle-calculator-input selection))
-
-     ;; Separator - do nothing
-     ((eq candidate 'separator) nil)
-
-     ;; Handle matched candidates
-     (candidate
-      (let ((type (car candidate))
-            (item (cadr candidate)))
-        (pcase type
-          ('buffer (switch-to-buffer item))
-          ('running (universal-launcher--focus-running-application item))
-          ('app (universal-launcher--run-application item))
-          ('firefox-action (universal-launcher--handle-firefox-action item))
-          ('bookmark (universal-launcher--handle-bookmark item))
-          ('file (find-file item))
-          ('command (universal-launcher--run-command item))
-          ('emoji (universal-launcher--insert-emoji item))
-          ('ssh (universal-launcher--ssh-connect item))
-          ('calculator (message "🧮 Type a math expression like: 2+2, sqrt(16), sin(45)"))
-          ('org-task (universal-launcher--jump-to-task item))
-          ('kill-ring (universal-launcher--yank-from-ring item))
-          ('custom-action (universal-launcher--execute-custom-action item))
-          ('function (funcall item))
-          ('async-shell
-           (let ((default-directory (or (locate-dominating-file default-directory ".git")
-                                        default-directory)))
-             (async-shell-command item)))
-          ('shell-command
-           (let ((default-directory (or (locate-dominating-file default-directory ".git")
-                                        default-directory)))
-             (shell-command item)))
-          (_ (message "Unknown action type: %s" type)))))
-
-     ;; Web search fallback - only if not a calculator expression
-     ((and (not candidate)
-           (not (string-empty-p selection))
-           (not (universal-launcher--is-calculator-input selection)))
-      (universal-launcher--web-search selection)))
-
-    ;; Return to previous frame
-    (when (and universal-launcher--previous-frame
-               (frame-live-p universal-launcher--previous-frame))
-      (select-frame-set-input-focus universal-launcher--previous-frame))))
-
-;; Set up background update timer
-(run-with-timer universal-launcher--update-interval
-                universal-launcher--update-interval
-                #'universal-launcher--update-candidates)
+;; Pay the cold cost once, while you're idle, instead of on first popup.
+(run-with-idle-timer 2 nil #'universal-launcher--collect)
 
 (provide 'universal-launcher)
 ;;; universal-launcher.el ends here
