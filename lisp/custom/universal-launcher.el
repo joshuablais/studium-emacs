@@ -260,13 +260,15 @@ Context is the buffer of the main frame, also when launched floating."
 or the old form (NAME . (TYPE . ACTION))."
   :type 'sexp)
 
-(defcustom universal-launcher-default-search-engine "DuckDuckGo"
+(defcustom universal-launcher-default-search-engine "4get"
   "Engine used by the plain \"Search\" candidate."
   :type 'string)
 
 (defcustom universal-launcher-search-engines
   '(("DuckDuckGo"        "d"     "https://duckduckgo.com/?q=")
     ("Google"            "g"     "https://www.google.com/search?q=")
+    ("Claude" "c"  "https://claude.ai/new?q=")
+    ("Gemini" "ge" "https://gemini.google.com/app?q=")
     ("Searx"             "sx"    "https://searx.labrynth.org/search?q=")
     ("Hister"            "h"     "http://127.0.0.1:4433/?q=")
     ("Kagi"              "k"     "https://kagi.com/search?q=")

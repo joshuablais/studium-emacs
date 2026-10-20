@@ -54,12 +54,12 @@
 (keymap-global-set "C-c o d" #'dirvish)
 (keymap-global-set "C-c y m" #'mu4e-org-mode)
 ;; Net
-(keymap-global-set "C-c e r" #'my/erc-connect)
-(keymap-global-set "C-c e w" #'eww)
-(keymap-global-set "C-c e l" #'elpher)
-(keymap-global-set "C-c e e" #'elfeed)
-(keymap-global-set "C-c e u" #'elfeed-update)
-(keymap-global-set "C-c e v" #'elfeed-tube-mpv)
+;; (keymap-global-set "C-c e r" #'my/erc-connect)
+(keymap-global-set "C-t e w" #'eww)
+(keymap-global-set "C-t e l" #'elpher)
+(keymap-global-set "C-t e e" #'elfeed)
+(keymap-global-set "C-t e u" #'elfeed-update)
+(keymap-global-set "C-t e v" #'elfeed-tube-mpv)
 ;; Misc
 (keymap-global-set "C-c t z" #'my/zen-mode)
 (keymap-global-set "C-c B"   #'my/scratch-popup)
