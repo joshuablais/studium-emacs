@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: New Transaction (incoming)
+# key: in
+# --
+
+; ${1:Description}
+Assets:Bank:Checking               CAD ${2:Amount}
+Liabilities:GST_Payable            CAD -${3:GST}
+Income:${5:Source}                 CAD -${4:Income}

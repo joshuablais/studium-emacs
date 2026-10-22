@@ -275,6 +275,7 @@
 (require 'workspaces)
 ;; (require 'roam-everywhere)
 (require 'elpher-config)
+(require 'ediff-config)
 (require 'tramp-config)
 (require 'gnus-config)
 (require 'tools)
