@@ -129,6 +129,9 @@
       auto-save-interval 300
       auto-save-timeout 30)
 
+(setq-default cursor-type 'bar)
+(setq blink-cursor-blinks 0)
+
 (use-package savehist
   :ensure nil
   :config
@@ -216,26 +219,26 @@
 (advice-add 'treesit-ready-p :before #'jb/treesit-ensure-direnv-path)
 
 ;; TESTING
-(defvar studium--require-times nil)
+;; (defvar studium--require-times nil)
 
-(define-advice require (:around (fn feature &rest args) studium-time)
-  (if (featurep feature)
-      (apply fn feature args)
-    (let ((t0 (current-time)))
-      (prog1 (apply fn feature args)
-        (push (cons feature (float-time (time-since t0)))
-              studium--require-times)))))
+;; (define-advice require (:around (fn feature &rest args) studium-time)
+;;   (if (featurep feature)
+;;       (apply fn feature args)
+;;     (let ((t0 (current-time)))
+;;       (prog1 (apply fn feature args)
+;;         (push (cons feature (float-time (time-since t0)))
+;;               studium--require-times)))))
 
-(defun studium-require-report ()
-  (interactive)
-  (advice-remove 'require #'require@studium-time)
-  (with-current-buffer (get-buffer-create "*require-times*")
-    (erase-buffer)
-    (dolist (e (seq-take (sort studium--require-times
-                               (lambda (a b) (> (cdr a) (cdr b))))
-                         30))
-      (insert (format "%8.1f ms  %s\n" (* 1000 (cdr e)) (car e))))
-    (display-buffer (current-buffer))))
+;; (defun studium-require-report ()
+;;   (interactive)
+;;   (advice-remove 'require #'require@studium-time)
+;;   (with-current-buffer (get-buffer-create "*require-times*")
+;;     (erase-buffer)
+;;     (dolist (e (seq-take (sort studium--require-times
+;;                                (lambda (a b) (> (cdr a) (cdr b))))
+;;                          30))
+;;       (insert (format "%8.1f ms  %s\n" (* 1000 (cdr e)) (car e))))
+;;     (display-buffer (current-buffer))))
 
 ;; Modules
 (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
@@ -246,7 +249,7 @@
 (require 'magit-config)
 (require 'mail)
 (require 'move-text-config)
-;; (require 'flash-config)
+(require 'flash-config)
 (require 'pass-config)
 (require 'org-caldav-config)
 (require 'development)
