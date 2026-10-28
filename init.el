@@ -196,6 +196,9 @@
   (setq which-key-idle-delay 0.1)
   (which-key-mode 1))
 
+(setq isearch-allow-motion t
+      isearch-motion-changes-direction t)
+
 (use-package recentf
   :ensure nil
   :config
