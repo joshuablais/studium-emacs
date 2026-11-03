@@ -26,6 +26,36 @@
  (rear-context-string . "96 Aug 26 10:26 ")
  (position . 95)
  (last-modified 27343 46158 899467 675000))
+("youtube-dl"
+ (filename . "~/Downloads/Elfeed/youtube/")
+ (front-context-string . "Le Chant des Tem")
+ (rear-context-string . "67 Oct 13 20:23 ")
+ (position . 92)
+ (last-modified 27342 59365 883219 971000))
+("meow-setup.el"
+ (filename . "~/.config/guix/dotfiles/emacs/lisp/meow-setup.el")
+ (front-context-string . "   '(\"RET\" . boo")
+ (rear-context-string . "ookmark-delete)\n")
+ (position . 1168)
+ (last-modified 27334 45411 549478 559000))
+("Ledger 2026"
+ (filename . "~/Accounting/Revere/2026/Ledger/transactions.ledger")
+ (front-context-string . ";===============")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27309 36447 430055 465000))
+("transactions.ledger"
+ (filename . "~/Accounting/Revere/2026/Ledger/transactions.ledger")
+ (front-context-string . ";===============")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27309 36444 358064 20000))
+("Projects"
+ (filename . "~/Projects/")
+ (front-context-string . "Revere\n  drwxr-x")
+ (rear-context-string . "96 Aug 24 09:23 ")
+ (position . 647)
+ (last-modified 27305 31784 346976 0))
 ("missionproject"
  (filename . "~/Development/HWD Sites/missionproject/")
  (front-context-string . "channels.scm\n  -")
