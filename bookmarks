@@ -2,12 +2,42 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("renaissance playlist"
-  (filename . "~/Development/playlist/")
-  (front-context-string . "index.html\n  -rw")
-  (rear-context-string . "30 Sep  9 09:59 ")
-  (position . 87)
-  (last-modified 27297 33400 114657 131000))
+(("2026 Ledger"
+  (filename . "~/Accounting/Revere/2026/Ledger/transactions.ledger")
+  (front-context-string . "\n    Assets:Bank")
+  (rear-context-string . "ming from Stripe")
+  (position . 52026)
+  (last-modified 27369 62745 712225 888000))
+("calendar.org"
+ (filename . "~/org/calendar.org")
+ (front-context-string . "* Events\n:PROPER")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 27367 60789 250783 562000))
+("Emacs"
+ (filename . "~/nixos-config/dotfiles/emacs/")
+ (front-context-string . "lisp\n  drwxr-xr-")
+ (rear-context-string . "0K Oct 21 09:11 ")
+ (position . 433)
+ (last-modified 27354 29906 692314 468000))
+("mistaya"
+ (filename . "~/Development/HWD Sites/mistaya/")
+ (front-context-string . "cmd\n  drwxr-xr-x")
+ (rear-context-string . "96 Aug 26 10:26 ")
+ (position . 95)
+ (last-modified 27343 46158 899467 675000))
+("missionproject"
+ (filename . "~/Development/HWD Sites/missionproject/")
+ (front-context-string . "channels.scm\n  -")
+ (rear-context-string . "86 Sep 10 15:36 ")
+ (position . 432)
+ (last-modified 27300 46225 60213 219000))
+("renaissance playlist"
+ (filename . "~/Development/playlist/")
+ (front-context-string . "index.html\n  -rw")
+ (rear-context-string . "30 Sep  9 09:59 ")
+ (position . 87)
+ (last-modified 27297 33400 114657 131000))
 ("renaissance books"
  (filename . "~/Development/books/README.org")
  (front-context-string . "#+title: Books\n\n")
@@ -57,11 +87,11 @@
  (position . 137)
  (last-modified 27259 56250 648817 807000))
 ("org-capture-last-stored"
- (filename . "~/org/roam/daily/2026-09-09.org")
- (front-context-string . "* 08:42: \nCan I ")
- (rear-context-string . "luttringhausen/\n")
- (position . 189)
- (last-modified 27297 28792 661424 476000))
+ (filename . "~/org/roam/daily/2026-11-03.org")
+ (front-context-string . "** DONE Payout T")
+ (rear-context-string . "operty manager.\n")
+ (position . 1662)
+ (last-modified 27370 1793 265107 24000))
 ("notes"
  (filename . "~/org/notes.org")
  (front-context-string . "** [2026-08-21 F")

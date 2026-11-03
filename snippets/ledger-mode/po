@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: Payout (outgoing)
+# key: po
+# --
+
+; ${1:Description}
+Assets:Bank:Checking               CAD -${2:Amount}
+Liabilities:GST_Payable            CAD ${3:GST}
+Expenses:${5:Payout}               CAD ${4:Income}
