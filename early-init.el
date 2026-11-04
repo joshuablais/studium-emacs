@@ -5,7 +5,7 @@
       gc-cons-percentage 1.0)
 
 ;; Opacity
-(add-to-list 'default-frame-alist '(alpha-background . 95))
+(add-to-list 'default-frame-alist '(alpha-background . 99))
 
 (add-hook 'emacs-startup-hook
           (lambda ()
