@@ -118,10 +118,10 @@
  (last-modified 27259 56250 648817 807000))
 ("org-capture-last-stored"
  (filename . "~/org/roam/daily/2026-11-03.org")
- (front-context-string . "** DONE Payout T")
- (rear-context-string . "operty manager.\n")
- (position . 1662)
- (last-modified 27370 1793 265107 24000))
+ (front-context-string . "** 15:17: To rea")
+ (rear-context-string . "END:\n\n\n* Notes\n\n")
+ (position . 2786)
+ (last-modified 27370 20353 429733 918000))
 ("notes"
  (filename . "~/org/notes.org")
  (front-context-string . "** [2026-08-21 F")

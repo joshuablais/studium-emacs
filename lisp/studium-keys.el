@@ -124,8 +124,9 @@
 (keymap-global-set "C-S-u" #'undo-only)
 (keymap-global-set "C-S-r" #'undo-redo)
 
-;; Replace meow-inner/outer
+;; Replaces meow-inner/outer
 (defconst studium--pairs '((?\( . ?\)) (?\[ . ?\]) (?\{ . ?\}) (?< . ?>)))
+(defconst studium--quotes '(?\" ?\' ?`))
 
 (defun studium--pair-bounds (open close)
   "Bounds of the nearest OPEN...CLOSE pair enclosing point, or nil."
@@ -170,12 +171,41 @@
             (when (search-forward s (pos-eol) t)
               (cons beg (point)))))))))
 
+(defun studium--delimited-at (ch)
+  "Bounds of the CH-delimited thing enclosing point, or nil."
+  (if-let* ((closer (alist-get ch studium--pairs)))
+      (studium--pair-bounds ch closer)
+    (studium--quote-bounds ch)))
+
+(defun studium--delimited (ch)
+  "Bounds of the CH thing enclosing point; failing that, seek along the line.
+Order: enclosing, then the next one after point, then the last one before it.
+Candidates are verified by `studium--delimited-at', so the parser stays in charge."
+  (when (or (assq ch studium--pairs) (memq ch studium--quotes))
+    (let ((open (string ch))
+          (close (string (or (alist-get ch studium--pairs) ch))))
+      (or (studium--delimited-at ch)
+          ;; Forward: stand just after each opener; keep it only if it opens.
+          (save-excursion
+            (let ((lim (pos-eol)) found)
+              (while (and (not found) (search-forward open lim t))
+                (let ((beg (match-beginning 0))
+                      (b (studium--delimited-at ch)))
+                  (when (and b (= (car b) beg)) (setq found b))))
+              found))
+          ;; Backward: stand just before each closer; keep it only if it closes.
+          (save-excursion
+            (let ((lim (pos-bol)) found)
+              (while (and (not found) (search-backward close lim t))
+                (let ((end (match-end 0))
+                      (b (studium--delimited-at ch)))
+                  (when (and b (= (cdr b) end)) (setq found b))))
+              found))))))
+
 (defun studium--thing (ch)
   "Return (OUTER . INNER) for the thing keyed by CH; each is (BEG . END)."
   (let* ((ch (or (car (rassq ch studium--pairs)) ch))
-         (closer (alist-get ch studium--pairs))
-         (delimited (cond (closer (studium--pair-bounds ch closer))
-                          ((memq ch '(?\" ?\' ?`)) (studium--quote-bounds ch)))))
+         (delimited (studium--delimited ch)))
     (cond
      (delimited
       (cons delimited (cons (1+ (car delimited)) (1- (cdr delimited)))))
@@ -191,11 +221,12 @@
         (cons b b))))))
 
 (defun studium--mark-thing (prompt pick)
-  (let ((thing (or (studium--thing
-                    (read-char (concat prompt " ( [ { < \" ' ` e p d l w b: ")))
-                   (user-error "No such thing around point"))))
-    (goto-char (car (funcall pick thing)))
-    (push-mark (cdr (funcall pick thing)) nil t)))
+  (let* ((thing (or (studium--thing
+                     (read-char (concat prompt " ( [ { < \" ' ` e p d l w b: ")))
+                    (user-error "No such thing around point")))
+         (bounds (funcall pick thing)))
+    (goto-char (car bounds))
+    (push-mark (cdr bounds) nil t)))
 
 (defun studium/mark-inner ()
   "Select the inside of the thing named by the next key."
@@ -209,7 +240,6 @@
 
 (keymap-global-set "M-i" #'studium/mark-inner)    ; was tab-to-tab-stop
 (keymap-global-set "M-o" #'studium/mark-bounds)   ; unbound by default
-
 ;; Resizing windows
 (global-set-key (kbd "S-<right>") (lambda () (interactive)
                                     (if (window-in-direction 'left)
