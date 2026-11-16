@@ -33,7 +33,7 @@
   '("github.com" "gitlab.com" "codeberg.org" "forge.labrynth.org"
     "google.com" "annas-archive.gl" "search.nixos.org" "toys.whereis.social"
     "goodreads.com" "youtube.com" "reddit.com" "kagi.com"
-    "perplexity.ai" "wolframalpha.com" "sourcegraph.com"
+    "perplexity.ai" "wolframalpha.com" "sourcegraph.com" "interactivebrokers.com"
     "archive.org" "yandex.com" "searx.labrynth.org" "127.0.0.1:4433"
     "wikipedia.org")
   "Domains (and their subdomains) that go to the external browser, not eww.")
