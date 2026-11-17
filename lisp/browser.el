@@ -83,13 +83,10 @@
 
 (use-package shr-tag-pre-highlight
   :ensure t
-  :after shr
+  :demand t
   :config
   (add-to-list 'shr-external-rendering-functions
                '(pre . shr-tag-pre-highlight)))
-
-(use-package language-detection
-  :ensure t)
 
 (defun jb/eww-download-image-at-point ()
   "Download image at point to `eww-download-directory'."
