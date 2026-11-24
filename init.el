@@ -319,3 +319,4 @@
          ("C-c p p" . pomodoro-pause-toggle)))
 
 (put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
