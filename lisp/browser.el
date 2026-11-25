@@ -58,7 +58,7 @@
 
 ;; No catch-all handler: unmatched URLs fall through to
 ;; browse-url-default-handlers (mailto:, man:, ...) and then to eww.
-(setq browse-url-browser-function #'eww-browse-url
+(setq browse-url-browser-function #'jb/browse-url-external
       browse-url-secondary-browser-function #'jb/browse-url-external)
 
 ;; Links clicked inside eww skip browse-url entirely unless they match
